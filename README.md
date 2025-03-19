@@ -34,3 +34,5 @@ cd vcpkg
 ./vcpkg install crow # устанавливаем crow
 ./vcpkg install libpqxx #устанавливаем библиотеку для работы c++ с базой данных postgresql
 ```
+В Clion в директории File → Settings → Build, Execution, Deployment → CMake В поле "CMake options" вставить -`-DCMAKE_TOOLCHAIN_FILE=/mnt/d/project/online-library/vcpkg/scripts/buildsystems/vcpkg.cmake
+`

@@ -1,57 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>online-library</title>
-    <style>
-        body {
-            font-family: "Times New Roman";
-            max-width: 800px;
-            margin: 30px auto;
-        }
-
-        .book {
-            border: 1px solid #ccc;
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 6px;
-        }
-
-        .book-title {
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        .book-author {
-            color: gray;
-        }
-    </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Онлайн Библиотека</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<h1>Подборка книг📚</h1>
-<script>
-    fetch("http://localhost:18080/books")
-        .then(res => res.json())
-        .then(data => {
-            const container = document.getElementById("books");
-            data = Object.values(data); // crow возвращает объект с числовыми ключами
+<header>
+    <h1>Добро пожаловать в Онлайн Библиотеку</h1>
+    <nav>
+        <a href="books.html">Список книг</a>
+    </nav>
+</header>
 
-            data.slice(0, 3).forEach(book => {
-                const div = document.createElement("div");
-                div.className = "book";
-                div.innerHTML = `
-    <div class="book-title">${book.title}</div>
-    <div class="book-author">${book.author}</div>
-    <div><em>${book.tags}</em></div>
-    <div><a href="http://localhost:18080/books/${book.id}/download">Скачать</a></div>
-    `;
-                container.appendChild(div);
-            });
-        })
-        .catch(err => {
-            document.getElementById("books").textContent = "Ошибка загрузки книг.";
-            console.error(err);
-        });
-</script>
+<main>
+    <p>Здесь вы можете читать книги онлайн, искать по жанрам и авторам.</p>
+</main>
+
+<footer>
+    <p>&copy; 2025 Онлайн Библиотека</p>
+</footer>
 </body>
 </html>

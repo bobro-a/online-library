@@ -1,4 +1,4 @@
-fetch("http://localhost:18080/books")
+fetch("http://localhost:8080/books")
     .then(res => res.json())
     .then(data => {
         const BookList = document.getElementById('book-list');
@@ -10,8 +10,8 @@ fetch("http://localhost:18080/books")
             div.innerHTML = `
               <h3>${book.title}</h3>
               <p><strong>Автор:</strong> ${book.author}</p>
-              <p><strong>Жанр:</strong> ${book.genre}</p>
-              <a href="${book.link}" target="_blank">Читать</a>
+              <p><strong>Жанр:</strong> ${book.tags}</p>
+              <a href="${pdf}" target="_blank">Читать</a>
             `;
             BookList.appendChild(div);
         });

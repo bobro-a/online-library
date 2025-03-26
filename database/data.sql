@@ -8,7 +8,7 @@ create table books(
     id serial primary key,
     title text not null,
     book_path text not null,
-    cover_path text not null,
+    cover_path text,
     author text not null,
     tags text not null
 );

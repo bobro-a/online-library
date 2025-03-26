@@ -12,13 +12,17 @@ struct Book {
     int id;
     string title;
     string author;
+    string cover_url;
+    string pdf_url;
 };
 
 string bookToJson(Book &book) {
     return "{"
            "\"id\":" + to_string(book.id) + ","
            "\"title\":\"" + book.title + "\","
-           "\"author\":\"" + book.author + "\""
+           "\"author\":\"" + book.author + "\","
+           "\"cover\":\"" + book.cover_url + "\","
+           "\"pdf\":\"" + book.pdf_url + "\""
            "}";
 }
 
@@ -34,15 +38,17 @@ string booksToJson(vector<Book> &books) {
 
 optional<Book> findBookById(int id) {
     try {
-        pqxx::connection conn("dbname=your_db user=your_user password=your_pass host=localhost");
+        pqxx::connection conn("dbname=online-library user=postgres password=secret host=localhost");
         pqxx::work txn(conn);
-        auto r = txn.exec_params("SELECT id, title, author FROM books WHERE id = $1", id);
+        auto r = txn.exec_params("SELECT id, title, author, book_path, cover_path FROM books WHERE id = $1", id);
 
         if (!r.empty()) {
             Book book;
             book.id = r[0]["id"].as<int>();
             book.title = r[0]["title"].as<string>();
             book.author = r[0]["author"].as<string>();
+            book.cover_url = r[0]["cover_path"].as<string>();
+            book.pdf_url   = r[0]["book_path"].as<string>();
             return book;
         }
     } catch (const exception &e) {
@@ -54,24 +60,26 @@ optional<Book> findBookById(int id) {
 vector<Book> getAllBooks() {
     vector<Book> books;
     try {
-        pqxx::connection conn("dbname=your_db user=your_user password=your_pass host=localhost");
+        pqxx::connection conn("dbname=online-library user=postgres password=secret host=localhost");
         pqxx::work txn(conn);
-        auto r = txn.exec("SELECT id, title, author FROM books");
+        auto r = txn.exec("SELECT id, title, author, book_path, cover_path FROM books");
 
-        for (auto row : r) {
+        for (auto row: r) {
             Book book;
             book.id = row["id"].as<int>();
             book.title = row["title"].as<string>();
             book.author = row["author"].as<string>();
+            book.cover_url = row["cover_path"].as<string>();
+            book.pdf_url = row["book_path"].as<string>();
             books.push_back(book);
         }
-    } catch (const exception& e) {
+    } catch (const exception &e) {
         cerr << "DB Error: " << e.what() << endl;
     }
     return books;
 }
 
-string handleRequest(const string& req) {
+string handleRequest(const string &req) {
     if (req.find("GET /books") == 0) {
         // Проверка на GET /books/{id}
         size_t pos = req.find("GET /books/");
@@ -86,7 +94,7 @@ string handleRequest(const string& req) {
                 if (book) {
                     string body = bookToJson(*book);
                     return "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " +
-                        to_string(body.size()) + "\r\n\r\n" + body;
+                           to_string(body.size()) + "\r\n\r\n" + body;
                 } else {
                     return "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nBook not found";
                 }
@@ -99,7 +107,7 @@ string handleRequest(const string& req) {
         auto books = getAllBooks();
         string body = booksToJson(books);
         return "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " +
-            to_string(body.size()) + "\r\n\r\n" + body;
+               to_string(body.size()) + "\r\n\r\n" + body;
     }
 
     return "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nNot found";
@@ -112,7 +120,7 @@ int main() {
     addr.sin_port = htons(8080);
     addr.sin_addr.s_addr = INADDR_ANY;
 
-    bind(server_fd, (struct sockaddr*)&addr, sizeof(addr));
+    bind(server_fd, (struct sockaddr *) &addr, sizeof(addr));
     listen(server_fd, 1);
 
     cout << "REST API is running on port 8080...\n";

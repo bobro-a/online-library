@@ -7,12 +7,13 @@ create table users(
 create table books(
     id serial primary key,
     title text not null,
-    file_path text not null,
+    book_path text not null,
+    cover_path text not null,
     author text not null,
     tags text not null
 );
-insert into books(title,file_path,author,tags)
+insert into books(title,book_path,cover_path,author,tags)
 values
-    ('Анна Каренина','./books/Anna_Karenina.pdf','Лев Николаевич Толстой','классика'),
-    ('Мастер и Маргарита','./books/Master_Margarita.pdf','Михаил Афанасьевич Булгаков','классика'),
-    ('Портрет Дориана Грея','./books/Portret_Doriana_Greya.pdf','Оскар Уайлд','зарубежная классика');
+    ('Анна Каренина','./books/Anna_Karenina.pdf','./covers/Anna_Karenina.jpg','Лев Николаевич Толстой','классика'),
+    ('Мастер и Маргарита','./books/Master_Margarita.pdf','./covers/Master_Margarita.jpg','Михаил Афанасьевич Булгаков','классика'),
+    ('Портрет Дориана Грея','./books/Portret_Doriana_Greya.pdf','./covers/Portret_Doriana_Greya.jpg','Оскар Уайлд','зарубежная классика');

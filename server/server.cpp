@@ -97,24 +97,38 @@ string handleRequest(const string &req) {
                 auto book = findBookById(id);
                 if (book) {
                     string body = bookToJson(*book);
-                    return "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " +
-                           to_string(body.size()) + "\r\n\r\n" + body;
+                    return "HTTP/1.1 200 OK\r\n"
+                           "Content-Type: application/json\r\n"
+                           "Access-Control-Allow-Origin: *\r\n"
+                           "Content-Length: " + to_string(body.size()) + "\r\n\r\n" + body;
                 } else {
-                    return "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nBook not found";
+                    return "HTTP/1.1 404 Not Found\r\n"
+                           "Content-Type: text/plain\r\n"
+                           "Access-Control-Allow-Origin: *\r\n"
+                           "\r\nBook not found";
                 }
             } catch (...) {
-                return "HTTP/1.1 400 Bad Request\r\nContent-Type: text/plain\r\n\r\nInvalid ID";
+                return "HTTP/1.1 400 Bad Request\r\n"
+                       "Content-Type: text/plain\r\n"
+                       "Access-Control-Allow-Origin: *\r\n"
+                       "\r\nInvalid ID";
             }
         }
 
         // Если просто GET /books — вернуть все
         auto books = getAllBooks();
         string body = booksToJson(books);
-        return "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: " +
-               to_string(body.size()) + "\r\n\r\n" + body;
-    }
+        return "HTTP/1.1 200 OK\r\n"
+       "Content-Type: application/json\r\n"
+       "Access-Control-Allow-Origin: *\r\n"
+       "Content-Length: " + to_string(body.size()) + "\r\n\r\n" + body;
 
-    return "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nNot found";
+    }
+    return "HTTP/1.1 404 Not Found\r\n"
+       "Content-Type: text/plain\r\n"
+       "Access-Control-Allow-Origin: *\r\n"
+       "\r\nNot found";
+
 }
 
 int main() {

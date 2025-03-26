@@ -14,6 +14,7 @@ struct Book {
     string author;
     string cover_url;
     string pdf_url;
+    string tags;
 };
 
 string bookToJson(Book &book) {
@@ -22,7 +23,8 @@ string bookToJson(Book &book) {
            "\"title\":\"" + book.title + "\","
            "\"author\":\"" + book.author + "\","
            "\"cover\":\"" + book.cover_url + "\","
-           "\"pdf\":\"" + book.pdf_url + "\""
+           "\"pdf\":\"" + book.pdf_url + "\","
+           "\"tags\":\"" + book.tags + "\""
            "}";
 }
 
@@ -40,7 +42,7 @@ optional<Book> findBookById(int id) {
     try {
         pqxx::connection conn("dbname=online-library user=postgres password=secret host=localhost");
         pqxx::work txn(conn);
-        auto r = txn.exec_params("SELECT id, title, author, book_path, cover_path FROM books WHERE id = $1", id);
+        auto r = txn.exec_params("SELECT id, title, author, book_path, cover_path, tags FROM books WHERE id = $1", id);
 
         if (!r.empty()) {
             Book book;
@@ -48,7 +50,8 @@ optional<Book> findBookById(int id) {
             book.title = r[0]["title"].as<string>();
             book.author = r[0]["author"].as<string>();
             book.cover_url = r[0]["cover_path"].as<string>();
-            book.pdf_url   = r[0]["book_path"].as<string>();
+            book.pdf_url = r[0]["book_path"].as<string>();
+            book.tags = r[0]["tags"].as<string>();
             return book;
         }
     } catch (const exception &e) {
@@ -62,7 +65,7 @@ vector<Book> getAllBooks() {
     try {
         pqxx::connection conn("dbname=online-library user=postgres password=secret host=localhost");
         pqxx::work txn(conn);
-        auto r = txn.exec("SELECT id, title, author, book_path, cover_path FROM books");
+        auto r = txn.exec("SELECT id, title, author, book_path, cover_path, tags FROM books");
 
         for (auto row: r) {
             Book book;
@@ -71,6 +74,7 @@ vector<Book> getAllBooks() {
             book.author = row["author"].as<string>();
             book.cover_url = row["cover_path"].as<string>();
             book.pdf_url = row["book_path"].as<string>();
+            book.tags = row["tags"].as<string>();
             books.push_back(book);
         }
     } catch (const exception &e) {

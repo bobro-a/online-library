@@ -8,6 +8,8 @@
 
 using namespace std;
 
+pqxx::connection *conn;
+
 struct Book {
     int id;
     string title;
@@ -15,6 +17,8 @@ struct Book {
     string cover_url;
     string pdf_url;
     string tags;
+    double rating;
+    int year;
 };
 
 string bookToJson(Book &book) {
@@ -24,7 +28,9 @@ string bookToJson(Book &book) {
            "\"author\":\"" + book.author + "\","
            "\"cover\":\"" + book.cover_url + "\","
            "\"pdf\":\"" + book.pdf_url + "\","
-           "\"tags\":\"" + book.tags + "\""
+           "\"tags\":\"" + book.tags + "\","
+           "\"tags\":\"" + std::to_string(book.rating) + "\","
+           "\"tags\":\"" + std::to_string(book.year) + "\""
            "}";
 }
 
@@ -40,9 +46,8 @@ string booksToJson(vector<Book> &books) {
 
 optional<Book> findBookById(int id) {
     try {
-        pqxx::connection conn("dbname=online-library user=postgres password=secret host=localhost");
-        pqxx::work txn(conn);
-        auto r = txn.exec_params("SELECT id, title, author, book_path, cover_path, tags FROM books WHERE id = $1", id);
+        pqxx::work txn(*conn);
+        auto r = txn.exec_params("SELECT id, title, author, book_path, cover_path, tags, rating, year FROM books WHERE id = $1", id);
 
         if (!r.empty()) {
             Book book;
@@ -63,9 +68,8 @@ optional<Book> findBookById(int id) {
 vector<Book> getAllBooks() {
     vector<Book> books;
     try {
-        pqxx::connection conn("dbname=online-library user=postgres password=secret host=localhost");
-        pqxx::work txn(conn);
-        auto r = txn.exec("SELECT id, title, author, book_path, cover_path, tags FROM books");
+        pqxx::work txn(*conn);
+        auto r = txn.exec("SELECT id, title, author, book_path, cover_path, tags, rating, year FROM books");
 
         for (auto row: r) {
             Book book;
@@ -103,15 +107,15 @@ string handleRequest(const string &req) {
                            "Content-Length: " + to_string(body.size()) + "\r\n\r\n" + body;
                 } else {
                     return "HTTP/1.1 404 Not Found\r\n"
-                           "Content-Type: text/plain\r\n"
-                           "Access-Control-Allow-Origin: *\r\n"
-                           "\r\nBook not found";
+                            "Content-Type: text/plain\r\n"
+                            "Access-Control-Allow-Origin: *\r\n"
+                            "\r\nBook not found";
                 }
             } catch (...) {
                 return "HTTP/1.1 400 Bad Request\r\n"
-                       "Content-Type: text/plain\r\n"
-                       "Access-Control-Allow-Origin: *\r\n"
-                       "\r\nInvalid ID";
+                        "Content-Type: text/plain\r\n"
+                        "Access-Control-Allow-Origin: *\r\n"
+                        "\r\nInvalid ID";
             }
         }
 
@@ -119,16 +123,14 @@ string handleRequest(const string &req) {
         auto books = getAllBooks();
         string body = booksToJson(books);
         return "HTTP/1.1 200 OK\r\n"
-       "Content-Type: application/json\r\n"
-       "Access-Control-Allow-Origin: *\r\n"
-       "Content-Length: " + to_string(body.size()) + "\r\n\r\n" + body;
-
+               "Content-Type: application/json\r\n"
+               "Access-Control-Allow-Origin: *\r\n"
+               "Content-Length: " + to_string(body.size()) + "\r\n\r\n" + body;
     }
     return "HTTP/1.1 404 Not Found\r\n"
-       "Content-Type: text/plain\r\n"
-       "Access-Control-Allow-Origin: *\r\n"
-       "\r\nNot found";
-
+            "Content-Type: text/plain\r\n"
+            "Access-Control-Allow-Origin: *\r\n"
+            "\r\nNot found";
 }
 
 int main() {
@@ -142,7 +144,7 @@ int main() {
     listen(server_fd, 1);
 
     cout << "REST API is running on port 8080...\n";
-
+    conn = new pqxx::connection("dbname=online-library user=postgres password=secret host=localhost");
     while (true) {
         int client_fd = accept(server_fd, nullptr, nullptr);
         char buffer[4096];
@@ -155,7 +157,7 @@ int main() {
         }
         close(client_fd);
     }
-
+    delete conn;
     close(server_fd);
     return 0;
 }

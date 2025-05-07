@@ -47,7 +47,7 @@ string booksToJson(vector<Book> &books) {
 optional<Book> findBookById(int id) {
     try {
         pqxx::work txn(*conn);
-        auto r = txn.exec_params("SELECT id, title, author, book_path, cover_path, tags, rating, year FROM books WHERE id = $1", id);
+        auto r = txn.exec_params("SELECT * FROM books WHERE id = $1", id);
 
         if (!r.empty()) {
             Book book;
@@ -57,6 +57,8 @@ optional<Book> findBookById(int id) {
             book.cover_url = r[0]["cover_path"].as<string>();
             book.pdf_url = r[0]["book_path"].as<string>();
             book.tags = r[0]["tags"].as<string>();
+            book.rating = r[0]["rating"].as<double>();
+            book.year = r[0]["year"].as<int>();
             return book;
         }
     } catch (const exception &e) {
@@ -69,7 +71,7 @@ vector<Book> getAllBooks() {
     vector<Book> books;
     try {
         pqxx::work txn(*conn);
-        auto r = txn.exec("SELECT id, title, author, book_path, cover_path, tags, rating, year FROM books");
+        auto r = txn.exec("SELECT * FROM books");
 
         for (auto row: r) {
             Book book;
@@ -79,6 +81,8 @@ vector<Book> getAllBooks() {
             book.cover_url = row["cover_path"].as<string>();
             book.pdf_url = row["book_path"].as<string>();
             book.tags = row["tags"].as<string>();
+            book.rating = row["rating"].as<double>();
+            book.year = row["year"].as<int>();
             books.push_back(book);
         }
     } catch (const exception &e) {

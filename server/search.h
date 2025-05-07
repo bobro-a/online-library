@@ -1,19 +1,22 @@
 #pragme once
 #include <optional>
+#include <vector>
+using namespace std;
 
+extern pqxx::connection* conn;
 
-void searchBooksBy(vector<Book> &books, std::optional<string> parametr) {
+vector<Book> searchBooksBy(vector<Book> &books, string& parametr,typename value) {
+    vector<Book> result;
     try {
-        if (parametr!="title"
-            && parametr!="author"
-            && parametr!="tags"
-            && parametr!="year"
-            && parametr!="rating") {
-            //TODO сделать так, чтобы выводилось на сайте сообщение об ошибке
-        }else {
-
+        pqxx::work txn(*conn);
+        string query="SELECT * FROM books";
+        if (!parametr.empty()) {
+            query+=" WHERE ";
+            if (parametr=="title") query+="title ILIKE %"+value+"%";
         }
+        auto r = txn.exec_params(query);
     } catch (const exception &e) {
         cerr << "DB Error: " << e.what() << endl;
     }
+    return result;
 }

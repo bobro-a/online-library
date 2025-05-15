@@ -76,6 +76,14 @@ vector<Book> getAllBooks() {
     return books;
 }
 
+string getField(const string &body, const string &field) {
+    size_t pos = body.find("\"" + field + "\":\"");
+    if (pos == string::npos) return string();
+    pos += field.length() + 4;
+    size_t end = body.find('"', pos);
+    return body.substr(pos, end - pos);
+}
+
 string handleRequest(const string &req) {
     if (req.find("GET /books") == 0) {
         // Проверка на GET /books/{id}
@@ -182,18 +190,9 @@ string handleRequest(const string &req) {
         string body = req.substr(body_pos + 4);
         string book_id_str, username, text;
 
-        // простой JSON-парсинг руками (лучше заменить на nlohmann/json)
-        auto getField = [&](const string &field) {
-            size_t pos = body.find("\"" + field + "\":\"");
-            if (pos == string::npos) return string();
-            pos += field.length() + 4;
-            size_t end = body.find('"', pos);
-            return body.substr(pos, end - pos);
-        };
-
-        book_id_str = getField("book_id");
-        username = getField("username");
-        text = getField("text");
+        book_id_str = getField(body,"book_id");
+        username = getField(body,"username");
+        text = getField(body,"text");
 
         try {
             pqxx::work txn(*conn);
@@ -210,16 +209,8 @@ string handleRequest(const string &req) {
         if (body_pos == string::npos) return "400 Bad Request";
         string body = req.substr(body_pos + 4);
 
-        auto getField = [&](const string &field) {
-            size_t pos = body.find("\"" + field + "\":\"");
-            if (pos == string::npos) return string();
-            pos += field.length() + 4;
-            size_t end = body.find('"', pos);
-            return body.substr(pos, end - pos);
-        };
-
-        string book_id_str = getField("book_id");
-        string rating_str = getField("rating");
+        string book_id_str = getField(body,"book_id");
+        string rating_str = getField(body,"rating");
 
         try {
             int book_id = stoi(book_id_str);
@@ -250,11 +241,91 @@ string handleRequest(const string &req) {
         if (body_pos == string::npos) return "400 Bad Request";
         string body = req.substr(body_pos + 4);
 
-        auto getField = [&](const string &field) {
-            size_t pos = body.find("\"" + field + "\":\"");
-            if (pos == string::npos) return string();
-            pos += field.length() + 4;
-            size_t end = body.find('"', pos);
-            return body.substr(pos, end - pos);
-        };
+        string username = getField(body,"username");
+        string password = getField(body,"password");
 
+        try {
+            pqxx::work txn(*conn);
+            if (isLogin) {
+                auto r = txn.exec_params("SELECT * FROM users WHERE username=$1 AND password=$2", username, password);
+                if (r.empty()) return "HTTP/1.1 401 Unauthorized\r\n\r\nInvalid credentials";
+            } else {
+                txn.exec_params("INSERT INTO users(username, password) VALUES ($1, $2)", username, password);
+            }
+            txn.commit();
+            return "HTTP/1.1 200 OK\r\n\r\nSuccess";
+        } catch (...) {
+            return "HTTP/1.1 400 Bad Request\r\n\r\nError";
+        }
+    }
+    if (req.find("POST /favorite") == 0) {
+        size_t body_pos = req.find("\r\n\r\n");
+        if (body_pos == string::npos) return "400 Bad Request";
+        string body = req.substr(body_pos + 4);
+
+        string username = getField(body,"username");
+        string book_id_str = getField(body,"book_id");
+        string action = getField(body,"action");
+
+        try {
+            pqxx::work txn(*conn);
+            auto r = txn.exec_params("SELECT id FROM users WHERE username=$1", username);
+            if (r.empty()) return "HTTP/1.1 404 Not Found\r\n\r\nUser not found";
+            int user_id = r[0][0].as<int>();
+            int book_id = stoi(book_id_str);
+
+            if (action == "add") {
+                txn.exec_params("INSERT INTO favorites(user_id, book_id) VALUES($1, $2) ON CONFLICT DO NOTHING", user_id, book_id);
+            } else if (action == "remove") {
+                txn.exec_params("DELETE FROM favorites WHERE user_id=$1 AND book_id=$2", user_id, book_id);
+            }
+            txn.commit();
+            return "HTTP/1.1 200 OK\r\n\r\nFavorite updated";
+        } catch (...) {
+            return "HTTP/1.1 400 Bad Request\r\n\r\nInvalid input";
+        }
+    }
+    if (req.find("GET /favorites?") == 0) {
+        size_t qpos = req.find("username=");
+        if (qpos == string::npos) return "400 Bad Request";
+        string username = req.substr(qpos + 9);
+        size_t space = username.find(' ');
+        if (space != string::npos) username = username.substr(0, space);
+
+        try {
+            pqxx::work txn(*conn);
+            auto u = txn.exec_params("SELECT id FROM users WHERE username=$1", username);
+            if (u.empty()) return "HTTP/1.1 404 Not Found\r\n\r\nUser not found";
+            int user_id = u[0][0].as<int>();
+
+            auto r = txn.exec_params(
+                "SELECT b.* FROM books b JOIN favorites f ON b.id = f.book_id WHERE f.user_id = $1", user_id
+            );
+
+            vector<Book> books;
+            for (auto row: r) {
+                Book book;
+                book.id = row["id"].as<int>();
+                book.title = row["title"].as<string>();
+                book.author = row["author"].as<string>();
+                book.cover_url = row["cover_path"].as<string>();
+                book.pdf_url = row["book_path"].as<string>();
+                book.tags = row["tags"].as<string>();
+                book.rating = row["rating"].as<double>();
+                book.year = row["year"].as<int>();
+                books.push_back(book);
+            }
+
+            string body = booksToJson(books);
+            return "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: "
+                   + to_string(body.size()) + "\r\n\r\n" + body;
+        } catch (...) {
+            return "HTTP/1.1 500 Internal Server Error\r\n\r\n";
+        }
+    }
+
+    return "HTTP/1.1 404 Not Found\r\n"
+            "Content-Type: text/plain\r\n"
+            "Access-Control-Allow-Origin: *\r\n"
+            "\r\nNot found";
+}

@@ -116,9 +116,14 @@ document.addEventListener('click', e => {
             })
             .then(() => {
                 alert(`Спасибо! Вы поставили ${value} ★`);
-                const ratingSpan = star.closest('.book-card').querySelector('.rating-value');
-                if (ratingSpan) ratingSpan.textContent = value.toFixed(1);
+                return fetch('http://localhost:8080/books');
             })
+            .then(res => res.json())
+            .then(data => {
+                books = data;
+                renderBooks(books);
+            })
+
             .catch(err => {
                 alert('❌ Не удалось отправить рейтинг');
                 console.error(err);

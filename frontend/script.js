@@ -55,7 +55,7 @@ function renderBooks(bookArray) {
             <h3>${book.title}</h3>
             <p><strong>Автор:</strong> ${book.author}</p>
             <p><strong>Жанр:</strong> ${book.tags || '—'}</p>
-            <p><strong>Год:</strong> ${book.year || '—'}</p>
+            <p><strong>Год:</strong> ${book.year || '-'}</p>
             <p><strong>Рейтинг:</strong> <span class="rating-value">${ratingValue}</span></p>
             <div class="rating-stars" data-id="${book.id}">
               ${[1, 2, 3, 4, 5].map(i => `<span class="star" data-value="${i}">★</span>`).join('')}
@@ -108,7 +108,7 @@ document.addEventListener('click', e => {
         fetch("http://localhost:8080/rate", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: bookId, rating: value })
+            body: JSON.stringify({ book_id: bookId, rating: value })
         })
             .then(res => {
                 if (!res.ok) throw new Error('Ошибка сервера');

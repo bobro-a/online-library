@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            books = data;  // сохраняем все книги
+            books = data;
             renderBooks(books);
         })
         .catch(err => {
@@ -25,18 +25,18 @@ window.addEventListener('DOMContentLoaded', () => {
     if (searchInput) {
         searchInput.addEventListener('input', () => {
             const query = searchInput.value.trim().toLowerCase();
-            const filtered = books.filter(
-                book =>
-                    book.title.toLowerCase().includes(query) || book.author.toLowerCase().includes(query));
+            const filtered = books.filter(book =>
+                book.title.toLowerCase().includes(query) ||
+                book.author.toLowerCase().includes(query)
+            );
             renderBooks(filtered);
         });
     }
 });
 
-// Функция для отрисовки книг
 function renderBooks(bookArray) {
     const BookList = document.getElementById('book-list');
-    BookList.innerHTML = '';  // Очищаем
+    BookList.innerHTML = '';
 
     if (bookArray.length === 0) {
         BookList.innerHTML = '<p>Книги не найдены.</p>';
@@ -47,27 +47,31 @@ function renderBooks(bookArray) {
         const div = document.createElement('div');
         div.className = 'book-card';
 
+        const ratingValue = (typeof book.rating === "number") ? book.rating.toFixed(1) : '—';
+
         div.innerHTML = `
+          <div class="card-content">
             <img src="${book.cover}" alt="Обложка книги" class="book-cover">
             <h3>${book.title}</h3>
             <p><strong>Автор:</strong> ${book.author}</p>
             <p><strong>Жанр:</strong> ${book.tags || '—'}</p>
-            <p><strong>Рейтинг:</strong> <span class="rating-value">${book.rating?.toFixed(1) || '—'}</span></p>
+            <p><strong>Рейтинг:</strong> <span class="rating-value">${ratingValue}</span></p>
             <div class="rating-stars" data-id="${book.id}">
-                ${[1, 2, 3, 4, 5].map(i => `<span class="star" data-value="${i}">★</span>`).join('')}
+              ${[1, 2, 3, 4, 5].map(i => `<span class="star" data-value="${i}">★</span>`).join('')}
             </div>
+          </div>
+          <div class="card-footer">
             <a href="${book.pdf}" target="_blank">📖 Читать</a>
             &nbsp;|&nbsp;
             <a href="${book.pdf}" download>⬇️ Скачать</a>
-
-        
             <div class="comment-section">
-                <textarea placeholder="Оставьте комментарий..." class="comment-text" data-id="${book.id}"></textarea>
-                <button class="comment-submit" data-id="${book.id}">💬 Отправить</button>
+              <textarea placeholder="Оставьте комментарий..." class="comment-text" data-id="${book.id}"></textarea>
+              <button class="comment-submit" data-id="${book.id}">💬 Отправить</button>
             </div>
+          </div>
         `;
 
-        // Подгружаем комментарии
+        // Загрузка комментариев
         fetch(`http://localhost:8080/comments?book_id=${book.id}`)
             .then(res => res.json())
             .then(comments => {
@@ -75,9 +79,10 @@ function renderBooks(bookArray) {
                 commentsContainer.className = 'comment-list';
 
                 if (comments.length > 0) {
-                    commentsContainer.innerHTML = '<p><strong>Комментарии:</strong></p>' + comments.map(c =>
-                        `<div class="comment"><span>${c.content}</span> <small>(${new Date(c.created_at).toLocaleString()})</small></div>`
-                    ).join('');
+                    commentsContainer.innerHTML = '<p><strong>Комментарии:</strong></p>' +
+                        comments.map(c =>
+                            `<div class="comment"><span>${c.content}</span> <small>(${new Date(c.created_at).toLocaleString()})</small></div>`
+                        ).join('');
                 } else {
                     commentsContainer.innerHTML = '<p><em>Комментариев пока нет.</em></p>';
                 }
@@ -91,31 +96,37 @@ function renderBooks(bookArray) {
         BookList.appendChild(div);
     });
 }
+
+// Обработка рейтинга и комментариев
 document.addEventListener('click', e => {
-    // обработка рейтинга
     if (e.target.classList.contains('star')) {
         const star = e.target;
-        const value = star.dataset.value;
-        const bookId = star.parentElement.dataset.id;
+        const value = parseInt(star.dataset.value);
+        const bookId = star.closest('.rating-stars').dataset.id;
 
         fetch("http://localhost:8080/rate", {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ id: bookId, rating: parseInt(value) })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: bookId, rating: value })
         })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('Ошибка сервера');
+                return res.json();
+            })
             .then(() => {
-                alert(`Спасибо за оценку! Вы поставили ${value} ★`);
+                alert(`Спасибо! Вы поставили ${value} ★`);
+                const ratingSpan = star.closest('.book-card').querySelector('.rating-value');
+                if (ratingSpan) ratingSpan.textContent = value.toFixed(1);
             })
             .catch(err => {
-                alert("Ошибка при отправке оценки.");
+                alert('❌ Не удалось отправить рейтинг');
                 console.error(err);
             });
     }
 
-    // обработка комментария
     if (e.target.classList.contains('comment-submit')) {
-        const bookId = e.target.dataset.id;
+        const button = e.target;
+        const bookId = button.dataset.id;
         const textarea = document.querySelector(`.comment-text[data-id="${bookId}"]`);
         const comment = textarea.value.trim();
 
@@ -124,10 +135,12 @@ document.addEventListener('click', e => {
             return;
         }
 
+        button.disabled = true;
+
         fetch("http://localhost:8080/comment", {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ id: bookId, comment: comment })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: bookId, comment })
         })
             .then(res => res.json())
             .then(() => {
@@ -137,6 +150,9 @@ document.addEventListener('click', e => {
             .catch(err => {
                 alert("❌ Ошибка при отправке комментария.");
                 console.error(err);
+            })
+            .finally(() => {
+                button.disabled = false;
             });
     }
 });

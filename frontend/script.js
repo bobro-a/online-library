@@ -112,7 +112,7 @@ document.addEventListener('click', e => {
         })
             .then(res => {
                 if (!res.ok) throw new Error('Ошибка сервера');
-                return res.json();
+                return res.text();
             })
             .then(() => {
                 alert(`Спасибо! Вы поставили ${value} ★`);

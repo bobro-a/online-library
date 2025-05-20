@@ -14,8 +14,8 @@ string bookToJson(Book &book) {
            "\"cover\":\"" + book.cover_url + "\","
            "\"pdf\":\"" + book.pdf_url + "\","
            "\"tags\":\"" + book.tags + "\","
-           "\"rating\":\"" + std::to_string(book.rating) + "\","
-           "\"year\":\"" + std::to_string(book.year) + "\""
+           "\"rating\":" + std::to_string(book.rating) + ","
+           "\"year\":" + std::to_string(book.year) +
            "}";
 }
 

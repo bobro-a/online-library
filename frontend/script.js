@@ -6,7 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             const BookList = document.getElementById('book-list');
             if (!BookList) {
-                console.error('❌ Элемент с id=\'book-list\' не найден в HTML.');
+                console.error('Элемент с id=\'book-list\' не найден в HTML.');
                 return;
             }
 
@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', () => {
         .catch(err => {
             const BookList = document.getElementById('book-list');
             if (BookList) {
-                BookList.textContent = '❌ Ошибка загрузки книг с сервера.';
+                BookList.textContent = 'Ошибка загрузки книг с сервера.';
             }
             console.error('Ошибка загрузки книг:', err);
         });
@@ -108,7 +108,7 @@ document.addEventListener('click', e => {
                 alert(`Спасибо за оценку! Вы поставили ${value} ★`);
             })
             .catch(err => {
-                alert("❌ Ошибка при отправке оценки.");
+                alert("Ошибка при отправке оценки.");
                 console.error(err);
             });
     }

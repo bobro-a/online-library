@@ -33,3 +33,6 @@ values
     ('Анна Каренина','/database/books/Anna_Karenina.pdf','/database/covers/Anna_Karenina.jpg','Лев Николаевич Толстой','классика',0,1878),
     ('Мастер и Маргарита','/database/books/Master_Margarita.pdf','/database/covers/Master_Margarita.jpg','Михаил Афанасьевич Булгаков','классика',0,1967),
     ('Портрет Дориана Грея','/database/books/Portret_Doriana_Greya.pdf','/database/covers/Portret_Doriana_Greya.jpg','Оскар Уайлд','зарубежная классика',0,1890);
+
+
+SELECT * FROM books;

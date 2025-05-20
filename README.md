@@ -11,7 +11,7 @@ sudo apt install postgresql postgresql-contrib
 sudo -u postgres psql
 CREATE DATABASE "online-library";
 \q #выход из postgresql
-sudo -u postgres psql -d "online-library" -f /database/data.sql #заполняем базу данных
+sudo -u postgres psql -d "online-library" -f frontend/database/data.sql #заполняем базу данных
 ```
 
 Проверка всё ли норм:

@@ -77,14 +77,33 @@ vector<Book> getAllBooks() {
 }
 
 string getField(const string &body, const string &field) {
-    size_t pos = body.find("\"" + field + "\":\"");
+    size_t pos = body.find("\"" + field + "\":");
     if (pos == string::npos) return string();
-    pos += field.length() + 4;
-    size_t end = body.find('"', pos);
+    pos += field.length() + 3;
+
+    // строка
+    if (body[pos] == '"') {
+        ++pos;
+        size_t end = body.find('"', pos);
+        return body.substr(pos, end - pos);
+    }
+
+    // число
+    size_t end = body.find_first_of(",}", pos);
     return body.substr(pos, end - pos);
 }
 
+
 string handleRequest(const string &req) {
+    if (req.find("OPTIONS") == 0) {
+        return "HTTP/1.1 204 No Content\r\n"
+                "Access-Control-Allow-Origin: *\r\n"
+                "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n"
+                "Access-Control-Allow-Headers: Content-Type\r\n"
+                "Access-Control-Max-Age: 86400\r\n"
+                "\r\n";
+    }
+
     if (req.find("GET /books") == 0) {
         // Проверка на GET /books/{id}
         size_t pos = req.find("GET /books/");
@@ -190,9 +209,9 @@ string handleRequest(const string &req) {
         string body = req.substr(body_pos + 4);
         string book_id_str, username, text;
 
-        book_id_str = getField(body,"book_id");
-        username = getField(body,"username");
-        text = getField(body,"text");
+        book_id_str = getField(body, "book_id");
+        username = getField(body, "username");
+        text = getField(body, "text");
 
         try {
             pqxx::work txn(*conn);
@@ -201,7 +220,9 @@ string handleRequest(const string &req) {
             txn.commit();
             return "HTTP/1.1 200 OK\r\n\r\nReview submitted";
         } catch (...) {
-            return "HTTP/1.1 500 Internal Server Error\r\n\r\n";
+            return "HTTP/1.1 500 Internal Server Error\r\n"
+                    "Access-Control-Allow-Origin: *\r\n"
+                    "Content-Type: text/plain\r\n\r\nInternal server error";
         }
     }
     if (req.find("POST /rate") == 0) {
@@ -209,8 +230,8 @@ string handleRequest(const string &req) {
         if (body_pos == string::npos) return "400 Bad Request";
         string body = req.substr(body_pos + 4);
 
-        string book_id_str = getField(body,"book_id");
-        string rating_str = getField(body,"rating");
+        string book_id_str = getField(body, "book_id");
+        string rating_str = getField(body, "rating");
 
         try {
             int book_id = stoi(book_id_str);
@@ -221,7 +242,10 @@ string handleRequest(const string &req) {
 
             // Получаем текущий рейтинг
             auto r = txn.exec_params("SELECT rating FROM books WHERE id = $1", book_id);
-            if (r.empty()) return "HTTP/1.1 404 Not Found\r\n\r\nBook not found";
+            if (r.empty())
+                return "HTTP/1.1 404 Not Found\r\n"
+                        "Access-Control-Allow-Origin: *\r\n"
+                        "Content-Type: text/plain\r\n\r\nBook not found";
 
             double current_rating = r[0][0].as<double>();
             double updated_rating = (current_rating + new_rating) / 2.0;
@@ -229,10 +253,15 @@ string handleRequest(const string &req) {
             // Обновляем рейтинг
             txn.exec_params("UPDATE books SET rating = $1 WHERE id = $2", updated_rating, book_id);
             txn.commit();
-
-            return "HTTP/1.1 200 OK\r\n\r\nRating updated";
+            string message="Rating updated";
+            return "HTTP/1.1 200 OK\r\n"
+                    "Access-Control-Allow-Origin: *\r\n"
+                    "Content-Type: text/plain\r\n"
+                    "Content-Length: "+ to_string(message.size()) + "\r\n\r\n" + message;
         } catch (...) {
-            return "HTTP/1.1 400 Bad Request\r\n\r\nInvalid input";
+            return "HTTP/1.1 400 Bad Request\r\n"
+                    "Access-Control-Allow-Origin: *\r\n"
+                    "Content-Type: text/plain\r\n\r\nInvalid input";
         }
     }
     if (req.find("POST /register") == 0 || req.find("POST /login") == 0) {
@@ -240,22 +269,34 @@ string handleRequest(const string &req) {
         size_t body_pos = req.find("\r\n\r\n");
         if (body_pos == string::npos) return "400 Bad Request";
         string body = req.substr(body_pos + 4);
-
-        string username = getField(body,"username");
-        string password = getField(body,"password");
+        string username = getField(body, "username");
+        string password = getField(body, "password");
 
         try {
             pqxx::work txn(*conn);
             if (isLogin) {
                 auto r = txn.exec_params("SELECT * FROM users WHERE username=$1 AND password=$2", username, password);
-                if (r.empty()) return "HTTP/1.1 401 Unauthorized\r\n\r\nInvalid credentials";
+                string msg = "Invalid credentials";
+                if (r.empty())
+                    return "HTTP/1.1 401 Unauthorized\r\n"
+                           "Access-Control-Allow-Origin: *\r\n"
+                           "Content-Type: text/plain\r\n"
+                           "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
             } else {
                 txn.exec_params("INSERT INTO users(username, password) VALUES ($1, $2)", username, password);
             }
             txn.commit();
-            return "HTTP/1.1 200 OK\r\n\r\nSuccess";
+            string msg = "Success";
+            return "HTTP/1.1 200 OK\r\n"
+                   "Access-Control-Allow-Origin: *\r\n"
+                   "Content-Type: text/plain\r\n"
+                   "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
         } catch (...) {
-            return "HTTP/1.1 400 Bad Request\r\n\r\nError";
+            string msg = "Error";
+            return "HTTP/1.1 400 Bad Request\r\n"
+                   "Access-Control-Allow-Origin: *\r\n"
+                   "Content-Type: text/plain\r\n"
+                   "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
         }
     }
     if (req.find("POST /favorite") == 0) {
@@ -263,26 +304,39 @@ string handleRequest(const string &req) {
         if (body_pos == string::npos) return "400 Bad Request";
         string body = req.substr(body_pos + 4);
 
-        string username = getField(body,"username");
-        string book_id_str = getField(body,"book_id");
-        string action = getField(body,"action");
+        string username = getField(body, "username");
+        string book_id_str = getField(body, "book_id");
+        string action = getField(body, "action");
 
         try {
             pqxx::work txn(*conn);
             auto r = txn.exec_params("SELECT id FROM users WHERE username=$1", username);
-            if (r.empty()) return "HTTP/1.1 404 Not Found\r\n\r\nUser not found";
+            if (r.empty()) {
+                string msg = "User not found";
+                return "HTTP/1.1 404 Not Found\r\n"
+                       "Access-Control-Allow-Origin: *\r\n"
+                       "Content-Type: text/plain\r\n"
+                       "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
+            }
             int user_id = r[0][0].as<int>();
             int book_id = stoi(book_id_str);
 
             if (action == "add") {
-                txn.exec_params("INSERT INTO favorites(user_id, book_id) VALUES($1, $2) ON CONFLICT DO NOTHING", user_id, book_id);
+                txn.exec_params("INSERT INTO favorites(user_id, book_id) VALUES($1, $2) ON CONFLICT DO NOTHING",
+                                user_id, book_id);
             } else if (action == "remove") {
                 txn.exec_params("DELETE FROM favorites WHERE user_id=$1 AND book_id=$2", user_id, book_id);
             }
             txn.commit();
-            return "HTTP/1.1 200 OK\r\n\r\nFavorite updated";
+            string msg="Favorite updated";
+            return "HTTP/1.1 200 OK\r\n"
+                    "Access-Control-Allow-Origin: *\r\n"
+                    "Content-Type: text/plain\r\n"
+                    "Content-Length: "+to_string(msg.size()) + "\r\n\r\n" + msg;;
         } catch (...) {
-            return "HTTP/1.1 400 Bad Request\r\n\r\nInvalid input";
+            return "HTTP/1.1 400 Bad Request\r\n"
+                    "Access-Control-Allow-Origin: *\r\n"
+                    "Content-Type: text/plain\r\n\r\nInvalid input";
         }
     }
     if (req.find("GET /favorites?") == 0) {
@@ -295,7 +349,15 @@ string handleRequest(const string &req) {
         try {
             pqxx::work txn(*conn);
             auto u = txn.exec_params("SELECT id FROM users WHERE username=$1", username);
-            if (u.empty()) return "HTTP/1.1 404 Not Found\r\n\r\nUser not found";
+            if (u.empty()) {
+                string message = "User not found";
+                return "HTTP/1.1 404 Not Found\r\n"
+                       "Access-Control-Allow-Origin: *\r\n"
+                       "Content-Type: text/plain\r\n"
+                       "Content-Length: " + to_string(message.size()) + "\r\n\r\n" + message;
+            }
+
+
             int user_id = u[0][0].as<int>();
 
             auto r = txn.exec_params(
@@ -317,12 +379,50 @@ string handleRequest(const string &req) {
             }
 
             string body = booksToJson(books);
-            return "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: "
-                   + to_string(body.size()) + "\r\n\r\n" + body;
+            return
+                    "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: "
+                    + to_string(body.size()) + "\r\n\r\n" + body;
         } catch (...) {
-            return "HTTP/1.1 500 Internal Server Error\r\n\r\n";
+            string msg="Internal server error";
+            return "HTTP/1.1 500 Internal Server Error\r\n"
+                    "Access-Control-Allow-Origin: *\r\n"
+                    "Content-Type: text/plain\r\n"
+                    "Content-Length: "+ to_string(msg.size()) + "\r\n\r\n" + msg;
+
         }
     }
+    if (req.find("GET /comments?book_id=") == 0) {
+        size_t id_pos = req.find("book_id=") + 8;
+        size_t end = req.find(' ', id_pos);
+        string id_str = req.substr(id_pos, end - id_pos);
+
+        try {
+            int book_id = stoi(id_str);
+            pqxx::work txn(*conn);
+            auto r = txn.exec_params("SELECT text, username, created_at FROM reviews WHERE book_id=$1", book_id);
+
+            string json = "[";
+            for (int i = 0; i < r.size(); ++i) {
+                json += "{";
+                json += "\"content\":\"" + r[i]["text"].as<string>() + "\",";
+                json += "\"user\":\"" + r[i]["username"].as<string>() + "\",";
+                json += "\"created_at\":\"" + r[i]["created_at"].as<string>() + "\"";
+                json += "}";
+                if (i != r.size() - 1) json += ",";
+            }
+            json += "]";
+
+            return "HTTP/1.1 200 OK\r\n"
+                   "Content-Type: application/json\r\n"
+                   "Access-Control-Allow-Origin: *\r\n"
+                   "Content-Length: " + to_string(json.size()) + "\r\n\r\n" + json;
+        } catch (...) {
+            return "HTTP/1.1 400 Bad Request\r\n"
+                    "Access-Control-Allow-Origin: *\r\n"
+                    "Content-Type: text/plain\r\n\r\nInvalid book_id";
+        }
+    }
+
 
     return "HTTP/1.1 404 Not Found\r\n"
             "Content-Type: text/plain\r\n"

@@ -24,26 +24,33 @@ fetch(`http://localhost:8080/books`)
         document.getElementById('book-cover').src = book.cover;
         document.getElementById('read-link').href = book.pdf;
         document.getElementById('download-link').href = book.pdf;
-        const favButton = document.getElementById('favorite-btn');
 
-        if (currentUser === "Гость") {
-            favButton.style.display = "none";
-        } else {
-            favButton.addEventListener("click", () => {
-                fetch("http://localhost:8080/favorite", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username: currentUser, book_id: bookId, action: "add" })
-                })
-                    .then(res => {
-                        if (!res.ok) throw new Error("Ошибка сервера");
-                        alert("Книга добавлена в избранное!");
-                    })
-                    .catch(err => {
-                        alert("❌ Не удалось добавить в избранное.");
-                        console.error(err);
+        const favBtn = document.getElementById('favorite-btn');
+        if (favBtn && currentUser && currentUser !== 'Гость') {
+            // Проверка, в избранном ли книга
+            fetch(`http://localhost:8080/favorites?username=${encodeURIComponent(currentUser)}`)
+                .then(res => res.json())
+                .then(favorites => {
+                    const isFavorite = favorites.some(f => f.id == book.id);
+                    favBtn.textContent = isFavorite ? '⭐ Удалить из избранного' : '⭐ Добавить в избранное';
+
+                    favBtn.addEventListener('click', () => {
+                        const action = isFavorite ? 'remove' : 'add';
+                        fetch("http://localhost:8080/favorite", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ currentUser, book_id: book.id, action })
+                        })
+                            .then(() => {
+                                isFavorite = !isFavorite;
+                                favBtn.textContent = isFavorite ? '⭐ Удалить из избранного' : '⭐ Добавить в избранное';
+                            })
+                            .catch(err => {
+                                alert('❌ Не удалось изменить избранное');
+                                console.error(err);
+                            });
                     });
-            });
+                });
         }
 
         if (currentUser === "Гость") {

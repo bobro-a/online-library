@@ -262,13 +262,23 @@ string handleRequest(const string &req) {
         try {
             pqxx::work txn(*conn);
             if (isLogin) {
-                auto r = txn.exec_params("SELECT * FROM users WHERE username=$1 AND password=$2", username, password);
+                auto r = txn.exec_params("SELECT password FROM users WHERE username=$1", username);
                 string msg = "Invalid credentials";
-                if (r.empty())
+
+                if (r.empty()) {
                     return "HTTP/1.1 401 Unauthorized\r\n"
                            "Access-Control-Allow-Origin: *\r\n"
                            "Content-Type: text/plain\r\n"
                            "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
+                }
+
+                string storedPassword = r[0][0].as<string>();
+                if (storedPassword != password) {
+                    return "HTTP/1.1 401 Unauthorized\r\n"
+                           "Access-Control-Allow-Origin: *\r\n"
+                           "Content-Type: text/plain\r\n"
+                           "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
+                }
             } else {
                 if (username.empty() || password.empty()) {
                     string msg = "Username and password required";

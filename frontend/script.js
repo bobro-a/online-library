@@ -1,23 +1,17 @@
 let books = [];  // Сохраняем список книг для фильтрации
 
 window.addEventListener('DOMContentLoaded', () => {
+    const BookList = document.getElementById('book-list');
+    if (!BookList) return;  // Защита: если элемент отсутствует — выходим
+
     fetch('http://localhost:8080/books')
         .then(res => res.json())
         .then(data => {
-            const BookList = document.getElementById('book-list');
-            if (!BookList) {
-                console.error('Элемент с id=\'book-list\' не найден в HTML.');
-                return;
-            }
-
             books = data;
             renderBooks(books);
         })
         .catch(err => {
-            const BookList = document.getElementById('book-list');
-            if (BookList) {
-                BookList.textContent = 'Ошибка загрузки книг с сервера.';
-            }
+            BookList.textContent = 'Ошибка загрузки книг с сервера.';
             console.error('Ошибка загрузки книг:', err);
         });
 
@@ -43,8 +37,23 @@ window.addEventListener('DOMContentLoaded', () => {
             renderBooks(filtered);
         });
     }
-});
 
+    // ✅ Показываем приветствие, если пользователь уже вошёл
+    const storedUser = localStorage.getItem('user');
+    const welcome = document.getElementById('welcome-message');
+    if (storedUser && welcome) {
+        welcome.textContent = `👋 Добро пожаловать, ${storedUser}!`;
+    }
+
+    // ✅ Обработка выхода
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('user');
+            location.reload();
+        });
+    }
+});
 function renderBooks(bookArray) {
     const BookList = document.getElementById('book-list');
     BookList.innerHTML = '';
@@ -241,9 +250,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return res.text();
             })
             .then(() => {
+                localStorage.setItem('user', username);  // сохраняем логин
                 loginModal.classList.add('hidden');
-                document.getElementById('welcome-message').textContent =
-                    `👋 Добро пожаловать, ${username}!`;
+
+                const welcome = document.getElementById('welcome-message');
+                if (welcome) {
+                    welcome.textContent = `👋 Добро пожаловать, ${username}!`;
+                }
             })
             .catch(err => {
                 alert('❌ Ошибка входа: ' + err.message);

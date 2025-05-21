@@ -8,10 +8,8 @@ sudo apt install postgresql postgresql-contrib
 ```
 Затем создаём таблицу через терминал:
 ```bash
-sudo -u postgres psql
-drop database if exists "online-library";
-CREATE DATABASE "online-library";
-\q
+sudo -u postgres psql -c "drop database if exists \"online-library\";"
+sudo -u postgres psql -c "CREATE DATABASE \"online-library\"";
 sudo -u postgres psql -d "online-library" -f frontend/database/data.sql #заполняем базу данных
 ```
 

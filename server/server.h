@@ -199,7 +199,6 @@ string handleRequest(const string &req) {
                    "Access-Control-Allow-Origin: *\r\n"
                    "Content-Type: application/json\r\n"
                    "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
-
         } catch (...) {
             return "HTTP/1.1 500 Internal Server Error\r\n"
                     "Access-Control-Allow-Origin: *\r\n"
@@ -271,6 +270,13 @@ string handleRequest(const string &req) {
                            "Content-Type: text/plain\r\n"
                            "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
             } else {
+                if (username.empty() || password.empty()) {
+                    string msg = "Username and password required";
+                    return "HTTP/1.1 400 Bad Request\r\n"
+                           "Access-Control-Allow-Origin: *\r\n"
+                           "Content-Type: text/plain\r\n"
+                           "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
+                }
                 txn.exec_params("INSERT INTO users(username, password) VALUES ($1, $2)", username, password);
             }
             txn.commit();
@@ -279,8 +285,15 @@ string handleRequest(const string &req) {
                    "Access-Control-Allow-Origin: *\r\n"
                    "Content-Type: text/plain\r\n"
                    "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
-        } catch (...) {
-            string msg = "Error";
+        } catch (const pqxx::unique_violation &e) {
+            string msg = "Username already exists";
+            return "HTTP/1.1 409 Conflict\r\n"
+                   "Access-Control-Allow-Origin: *\r\n"
+                   "Content-Type: text/plain\r\n"
+                   "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
+        } catch (const std::exception &e) {
+            string msg = "Error: ";
+            msg += e.what();
             return "HTTP/1.1 400 Bad Request\r\n"
                    "Access-Control-Allow-Origin: *\r\n"
                    "Content-Type: text/plain\r\n"

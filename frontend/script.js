@@ -52,7 +52,7 @@ function renderBooks(bookArray) {
         div.innerHTML = `
           <div class="card-content">
             <img src="${book.cover}" alt="Обложка книги" class="book-cover">
-            <h3>${book.title}</h3>
+            <h3><a href="book.html?id=${book.id}" class="book-title-link">${book.title}</a></h3>
             <p><strong>Автор:</strong> ${book.author}</p>
             <p><strong>Жанр:</strong> ${book.tags || '—'}</p>
             <p><strong>Год:</strong> ${book.year || '-'}</p>

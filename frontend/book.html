@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Книга</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header>
+    <h1 id="book-title">Загрузка...</h1>
+</header>
+<main>
+    <div class="book-layout">
+        <div class="book-cover-block">
+            <img id="book-cover" class="book-cover-large" alt="Обложка">
+        </div>
+        <div class="book-info">
+            <h2 id="book-title-info"></h2>
+            <p><strong>Автор:</strong> <span id="book-author"></span></p>
+            <p><strong>Жанр:</strong> <span id="book-tags"></span></p>
+            <p><strong>Год:</strong> <span id="book-year"></span></p>
+            <p><strong>Рейтинг:</strong> <span id="book-rating"></span></p>
+            <a id="read-link" target="_blank">📖 Читать</a> |
+            <a id="download-link" download>⬇️ Скачать</a>
+        </div>
+    </div>
+
+    <div id="comment-section"></div>
+</main>
+
+<script src="book.js"></script>
+</body>
+</html>

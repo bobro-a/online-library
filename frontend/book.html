@@ -41,15 +41,5 @@
 </main>
 
 <script src="book.js"></script>
-<script type="module">
-    import { setupFavoriteButton } from './favorites.js';
-
-    const favBtn = document.getElementById('favorite-btn');
-    if (favBtn) {
-        const bookId = parseInt(new URLSearchParams(window.location.search).get('id'));
-        setupFavoriteButton(favBtn, bookId);
-    }
-</script>
-
 </body>
 </html>

@@ -89,13 +89,34 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-function renderBooks(bookArray) {
+async function fetchUserFavorites(username) {
+    const res = await fetch(`http://localhost:8080/favorites?username=${encodeURIComponent(username)}`);
+    if (!res.ok) return [];
+    return await res.json();
+}
+
+function toggleFavoriteServer(bookId, username, action) {
+    return fetch("http://localhost:8080/favorite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, book_id: bookId, action })
+    });
+}
+
+async function renderBooks(bookArray) {
     const BookList = document.getElementById('book-list');
     BookList.innerHTML = '';
 
     if (bookArray.length === 0) {
         BookList.innerHTML = '<p>Книги не найдены.</p>';
         return;
+    }
+
+    const username = sessionStorage.getItem('user');
+    let favorites = [];
+    if (username && username !== 'Гость') {
+        const favResponse = await fetchUserFavorites(username);
+        favorites = favResponse.map(b => b.id);  // массив только ID
     }
 
     bookArray.forEach(book => {
@@ -157,21 +178,30 @@ function renderBooks(bookArray) {
                 console.error("Ошибка загрузки комментариев:", err);
             });
 
-        BookList.appendChild(div);
+        // Обработка кнопки "В избранное"
         const favBtn = div.querySelector('.favorite-btn');
-        if (favBtn) {
+        if (favBtn && username && username !== "Гость") {
             const bookId = parseInt(favBtn.dataset.id);
             const updateBtnText = () => {
-                favBtn.textContent = getFavorites().includes(bookId)
+                favBtn.textContent = favorites.includes(bookId)
                     ? '⭐ Удалить из избранного'
                     : '⭐ В избранное';
             };
             updateBtnText();
             favBtn.addEventListener('click', () => {
-                toggleFavorite(bookId);
-                updateBtnText();
+                const isFav = favorites.includes(bookId);
+                const action = isFav ? 'remove' : 'add';
+                toggleFavoriteServer(bookId, username, action).then(() => {
+                    if (isFav) {
+                        favorites = favorites.filter(id => id !== bookId);
+                    } else {
+                        favorites.push(bookId);
+                    }
+                    updateBtnText();
+                });
             });
         }
+        BookList.appendChild(div);
     });
 }
 

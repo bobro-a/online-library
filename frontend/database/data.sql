@@ -42,7 +42,15 @@ values ('Анна Каренина', '/database/books/Anna_Karenina.pdf', '/data
        ('Мастер и Маргарита', '/database/books/Master_Margarita.pdf', '/database/covers/Master_Margarita.jpg',
         'Михаил Афанасьевич Булгаков', 'классика', 1967),
        ('Портрет Дориана Грея', '/database/books/Portret_Doriana_Greya.pdf',
-        '/database/covers/Portret_Doriana_Greya.jpg', 'Оскар Уайлд', 'зарубежная классика', 1890);
+        '/database/covers/Portret_Doriana_Greya.jpg', 'Оскар Уайлд', 'зарубежная классика', 1890),
+       ('Гарри Поттер и философский камень', '/database/books/1_Harry-Potter-and-Philosophers-Stone.pdf',
+        '/database/covers/1_Harry-Potter-and-Philosophers-Stone.jpg', 'Джоан Роулинг', 'Фэнтези', 1997),
+       ('Война и мир', '/database/books/Tolstoy_Voina_i_mir.pdf',
+        '/database/covers/Tolstoy_Voina_i_mir.jpg', 'Лев Николаевич Толстой', 'Исторический роман', 1865),
+       ('Голодные игры', '/database/books/Hungry_games.pdf',
+        '/database/covers/Hungry_games.jpg', 'Сьюзен Коллинз', 'Антиутопия', 2008),
+       ('Три мушкетёра', '/database/books/Dyuma_Tri_mushketera.pdf',
+        '/database/covers/Dyuma_Tri_mushketera.jpg', 'Александр Дюма', 'Историко-приключенческий роман', 1844);
 
 
 SELECT *

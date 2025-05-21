@@ -22,6 +22,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 
     const searchField = document.getElementById('search-field');
+    const searchInput = document.getElementById('search-input');
 
     if (searchInput && searchField) {
         searchInput.addEventListener('input', () => {

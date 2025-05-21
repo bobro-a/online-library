@@ -10,6 +10,7 @@
 <header>
     <h1>Добро пожаловать в Онлайн Библиотеку</h1>
     <nav>
+        <button id="open-register">Регистрация</button>
         <a href="catalog.html">Список книг</a>
     </nav>
 </header>
@@ -18,8 +19,24 @@
     <p>Здесь вы можете читать книги онлайн, искать по жанрам и авторам.</p>
 </main>
 
+<div id="register-modal" class="modal hidden">
+    <div class="modal-content">
+        <span id="close-register" class="close">&times;</span>
+        <h2>Регистрация</h2>
+        <form id="register-form">
+            <label for="username">Имя пользователя:</label>
+            <input type="text" id="username" required>
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" required>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+    </div>
+</div>
+
 <footer>
     <p>&copy; 2025 Онлайн Библиотека</p>
 </footer>
+
+<script src="script.js"></script>
 </body>
 </html>

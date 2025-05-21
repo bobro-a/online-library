@@ -33,12 +33,10 @@ window.addEventListener('DOMContentLoaded', () => {
             const filtered = books.filter(book => {
                 const value = (book[field] ?? '').toString().toLowerCase();
 
-                // Для числовых полей — точное сравнение
                 if (['year', 'rating'].includes(field)) {
                     return value.startsWith(query);
                 }
 
-                // Для текстовых — по включению
                 return value.includes(query);
             });
 
@@ -174,4 +172,41 @@ document.addEventListener('click', e => {
                 button.disabled = false;
             });
     }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('register-modal');
+    const openBtn = document.getElementById('open-register');
+    const closeBtn = document.getElementById('close-register');
+    const form = document.getElementById('register-form');
+
+    openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+    });
+
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        fetch('http://localhost:8080/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Ошибка регистрации');
+                return res.text();
+            })
+            .then(() => {
+                alert('✅ Регистрация прошла успешно!');
+                modal.classList.add('hidden');
+            })
+            .catch(err => {
+                alert('❌ Не удалось зарегистрироваться');
+                console.error(err);
+            });
+    });
 });

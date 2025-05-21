@@ -73,14 +73,22 @@ document.addEventListener('click', e => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ book_id: bookId, rating: value })
         })
+            .then(res => {
+                if (!res.ok) throw new Error('Ошибка сервера');
+                return fetch("http://localhost:8080/books");
+            })
             .then(res => res.json())
-            .then(() => {
+            .then(data => {
+                const updatedBook = data.find(b => b.id == bookId);
+                if (updatedBook) {
+                    document.getElementById('book-rating').textContent = updatedBook.rating.toFixed(1);
+                }
                 alert(`Спасибо! Вы поставили ${value} ★`);
-                document.getElementById('book-rating').textContent = value.toFixed(1);
             })
             .catch(err => {
                 alert('❌ Не удалось отправить рейтинг');
                 console.error(err);
             });
+
     }
 });

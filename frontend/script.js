@@ -174,6 +174,7 @@ document.addEventListener('click', e => {
     }
 });
 
+//Регистрация
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('register-modal');
     const openBtn = document.getElementById('open-register');
@@ -206,6 +207,46 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 alert('❌ Не удалось зарегистрироваться');
+                console.error(err);
+            });
+    });
+});
+
+//Вход
+document.addEventListener('DOMContentLoaded', () => {
+    // Вход
+    const loginModal = document.getElementById('login-modal');
+    const openLogin = document.getElementById('open-login');
+    const closeLogin = document.getElementById('close-login');
+    const loginForm = document.getElementById('login-form');
+
+    openLogin.addEventListener('click', () => loginModal.classList.remove('hidden'));
+    closeLogin.addEventListener('click', () => loginModal.classList.add('hidden'));
+    window.addEventListener('click', e => {
+        if (e.target === loginModal) loginModal.classList.add('hidden');
+    });
+
+    loginForm.addEventListener('submit', e => {
+        e.preventDefault();
+        const username = document.getElementById('login-username').value.trim();
+        const password = document.getElementById('login-password').value.trim();
+
+        fetch('http://localhost:8080/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Неверные данные');
+                return res.text();
+            })
+            .then(() => {
+                loginModal.classList.add('hidden');
+                document.getElementById('welcome-message').textContent =
+                    `👋 Добро пожаловать, ${username}!`;
+            })
+            .catch(err => {
+                alert('❌ Ошибка входа: ' + err.message);
                 console.error(err);
             });
     });

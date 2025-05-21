@@ -133,9 +133,12 @@ async function renderBooks(bookArray) {
             <p><strong>Жанр:</strong> ${book.tags || '—'}</p>
             <p><strong>Год:</strong> ${book.year || '-'}</p>
             <p><strong>Рейтинг:</strong> <span class="rating-value">${ratingValue}</span></p>
-            <div class="rating-stars" data-id="${book.id}">
-              ${[1, 2, 3, 4, 5].map(i => `<span class="star" data-value="${i}">★</span>`).join('')}
-            </div>
+            ${currentUser === "Гость"
+            ? `<div class="rating-stars" style="opacity: 0.5; pointer-events: none;" title="Оценка доступна после входа">★ ★ ★ ★ ★</div>`
+            : `<div class="rating-stars" data-id="${book.id}">
+      ${[1, 2, 3, 4, 5].map(i => `<span class="star" data-value="${i}">★</span>`).join('')}
+    </div>`}
+
           </div>
           <div class="card-footer">
             ${currentUser === "Гость"

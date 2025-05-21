@@ -47,7 +47,7 @@ fetch(`http://localhost:8080/comments?book_id=${bookId}`)
             fetch("http://localhost:8080/comment", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: bookId, comment: text })
+                body: JSON.stringify({ book_id: bookId, comment: text })
             }).then(() => location.reload());
         });
     });

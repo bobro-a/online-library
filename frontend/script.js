@@ -1,4 +1,5 @@
 let books = [];  // Сохраняем список книг для фильтрации
+const currentUser = sessionStorage.getItem("user") || "Гость";
 
 window.addEventListener('DOMContentLoaded', () => {
     const user = sessionStorage.getItem('user');
@@ -87,6 +88,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 function renderBooks(bookArray) {
     const BookList = document.getElementById('book-list');
     BookList.innerHTML = '';
@@ -115,14 +117,21 @@ function renderBooks(bookArray) {
             </div>
           </div>
           <div class="card-footer">
-            <a href="${book.pdf}" target="_blank">📖 Читать</a>
-            &nbsp;|&nbsp;
-            <a href="${book.pdf}" download>⬇️ Скачать</a>
-            <button class="favorite-btn" data-id="${book.id}">⭐ В избранное</button>
-            <div class="comment-section">
-              <textarea placeholder="Оставьте комментарий..." class="comment-text" data-id="${book.id}"></textarea>
-              <button class="comment-submit" data-id="${book.id}">💬 Отправить</button>
-            </div>
+            ${currentUser === "Гость"
+            ? `<a href="${book.pdf}" target="_blank">📖 Читать</a> &nbsp;|&nbsp; <span class="disabled">⬇️ Скачать</span>`
+            : `<a href="${book.pdf}" target="_blank">📖 Читать</a> &nbsp;|&nbsp; <a href="${book.pdf}" download>⬇️ Скачать</a>`}
+            ${currentUser === "Гость"
+            ? `<button class="favorite-btn disabled" disabled title="Войдите, чтобы добавить в избранное">⭐ В избранное</button>`
+            : `<button class="favorite-btn" data-id="${book.id}">⭐ В избранное</button>`}
+            ${currentUser === "Гость"
+            ? `<p><em>Комментарии доступны только авторизованным пользователям.</em></p>`
+            : `
+    <div class="comment-section">
+      <textarea placeholder="Оставьте комментарий..." class="comment-text" data-id="${book.id}"></textarea>
+      <button class="comment-submit" data-id="${book.id}">💬 Отправить</button>
+    </div>
+  `}
+
           </div>
         `;
 
@@ -165,9 +174,11 @@ function renderBooks(bookArray) {
         }
     });
 }
+
 function getFavorites() {
     return JSON.parse(localStorage.getItem('favorites-list') || '[]');
 }
+
 function toggleFavorite(bookId) {
     let favorites = getFavorites();
     const index = favorites.indexOf(bookId);
@@ -190,8 +201,8 @@ document.addEventListener('click', e => {
 
         fetch("http://localhost:8080/rate", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ book_id: bookId, rating: value })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({book_id: bookId, rating: value})
         })
             .then(res => {
                 if (!res.ok) throw new Error('Ошибка сервера');
@@ -228,8 +239,8 @@ document.addEventListener('click', e => {
 
         fetch("http://localhost:8080/comment", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ book_id: bookId, username: "Гость", text: comment })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({book_id: bookId, username: "Гость", text: comment})
         })
             .then(res => res.json())
             .then(() => {
@@ -266,8 +277,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch('http://localhost:8080/register', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
         })
             .then(res => {
                 if (!res.ok) throw new Error('Ошибка регистрации');
@@ -305,8 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch('http://localhost:8080/login', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username, password})
         })
             .then(res => {
                 if (!res.ok) throw new Error('Неверные данные');

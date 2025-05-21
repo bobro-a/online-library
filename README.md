@@ -10,7 +10,7 @@ sudo apt install postgresql postgresql-contrib
 ```bash
 sudo -u postgres psql -c "drop database if exists \"online-library\";"
 sudo -u postgres psql -c "CREATE DATABASE \"online-library\"";
-sudo -u postgres psql -d "online-library" -f frontend/database/data.sql #заполняем базу данных
+sudo -u postgres psql -d "online-library" -f frontend/database/data.sql
 ```
 
 Проверка всё ли норм:

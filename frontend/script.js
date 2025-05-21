@@ -20,40 +20,37 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     const BookList = document.getElementById('book-list');
-    if (!BookList) return;  // Защита: если элемент отсутствует — выходим
-
-    fetch('http://localhost:8080/books')
-        .then(res => res.json())
-        .then(data => {
-            books = data;
-            renderBooks(books);
-        })
-        .catch(err => {
-            BookList.textContent = 'Ошибка загрузки книг с сервера.';
-            console.error('Ошибка загрузки книг:', err);
-        });
-
-    const searchField = document.getElementById('search-field');
-    const searchInput = document.getElementById('search-input');
-
-    if (searchInput && searchField) {
-        searchInput.addEventListener('input', () => {
-            const rawQuery = searchInput.value.trim();
-            const query = rawQuery.replace(',', '.').toLowerCase();
-            const field = searchField.value;
-
-            const filtered = books.filter(book => {
-                const value = (book[field] ?? '').toString().toLowerCase();
-
-                if (['year', 'rating'].includes(field)) {
-                    return value.startsWith(query);
-                }
-
-                return value.includes(query);
+    if (BookList) {
+        fetch('http://localhost:8080/books')
+            .then(res => res.json())
+            .then(data => {
+                books = data;
+                renderBooks(books);
+            })
+            .catch(err => {
+                BookList.textContent = 'Ошибка загрузки книг с сервера.';
+                console.error('Ошибка загрузки книг:', err);
             });
 
-            renderBooks(filtered);
-        });
+        const searchField = document.getElementById('search-field');
+        const searchInput = document.getElementById('search-input');
+
+        if (searchInput && searchField) {
+            searchInput.addEventListener('input', () => {
+                const rawQuery = searchInput.value.trim();
+                const query = rawQuery.replace(',', '.').toLowerCase();
+                const field = searchField.value;
+
+                const filtered = books.filter(book => {
+                    const value = (book[field] ?? '').toString().toLowerCase();
+                    return ['year', 'rating'].includes(field)
+                        ? value.startsWith(query)
+                        : value.includes(query);
+                });
+
+                renderBooks(filtered);
+            });
+        }
     }
 
     // ✅ Показываем приветствие, если пользователь уже вошёл

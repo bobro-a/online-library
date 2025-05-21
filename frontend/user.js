@@ -7,7 +7,7 @@ greeting.textContent = `Привет, ${username}!`;
 fetch(`http://localhost:8080/favorites?username=${encodeURIComponent(username)}`)
     .then(res => res.ok ? res.json() : Promise.reject("Ошибка получения избранного"))
     .then(books => {
-        const container = document.getElementById("favorites-list");
+        const container = document.getElementById("book-list");
         container.innerHTML = "";
 
         if (books.length === 0) {
@@ -30,7 +30,42 @@ fetch(`http://localhost:8080/favorites?username=${encodeURIComponent(username)}`
         });
     })
     .catch(err => {
-        const container = document.getElementById("favorites-list");
+        const container = document.getElementById("book-list");
         container.innerHTML = "<p>❌ Не удалось загрузить избранное.</p>";
         console.error(err);
     });
+
+// const logoutBtn = document.getElementById('logout-btn');
+// if (logoutBtn) {
+//     logoutBtn.addEventListener('click', () => {
+//         sessionStorage.removeItem('user');
+//         window.location.href = "index.html";
+//     });
+// }
+
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        sessionStorage.removeItem('user');
+
+        // Обновить иконку
+        const userInfo = document.getElementById('user-info');
+        const userMessage = document.getElementById('user-message');
+        if (userInfo && userMessage) {
+            userMessage.textContent = 'Гость';
+            userInfo.classList.remove('hidden');
+        }
+
+        // Обновить приветствие
+        const welcome = document.getElementById('welcome-message');
+        if (welcome) {
+            welcome.textContent = 'Вы не вошли в систему.';
+        }
+
+        // Показать кнопки входа/регистрации
+        const openLogin = document.getElementById('open-login');
+        const openRegister = document.getElementById('open-register');
+        if (openLogin) openLogin.classList.remove('hidden');
+        if (openRegister) openRegister.classList.remove('hidden');
+    });
+}

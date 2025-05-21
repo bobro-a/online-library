@@ -83,7 +83,7 @@ fetch(`http://localhost:8080/comments?book_id=${bookId}`)
         } else {
             container.innerHTML += `
       <textarea id="new-comment" placeholder="Оставьте комментарий."></textarea>
-      <button id="submit-comment">💬 Отправить</button>
+      <button id="submit-comment">Отправить</button>
     `;
 
             document.getElementById('submit-comment').addEventListener('click', () => {

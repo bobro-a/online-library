@@ -7,21 +7,32 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header>
-    <div id="user-info" class="user-info hidden">
-        👤 <span id="user-message"></span>
+<header class="main-header">
+    <div class="header-left">
+        <div id="user-info" class="user-info hidden">
+            <span id="user-message"></span>
+        </div>
     </div>
-    <h1>Добро пожаловать в Онлайн Библиотеку</h1>
-    <nav>
-        <button id="open-login">Вход</button>
-        <button id="open-register">Регистрация</button>
-        <a href="catalog.html">Список книг</a>
-    </nav>
+
+    <div class="header-center">
+        <h1>Добро пожаловать в Онлайн Библиотеку</h1>
+    </div>
+
+    <div class="header-right">
+        <nav class="nav-buttons">
+            <div class="auth-buttons">
+                <button id="open-login">Вход</button>
+                <button id="open-register">Регистрация</button>
+            </div>
+            <div class="nav-link-wrapper">
+                <a href="catalog.html">Список книг</a>
+            </div>
+        </nav>
+    </div>
 </header>
 
 <main>
     <p id="welcome-message">Здесь вы можете читать книги онлайн, искать по жанрам и авторам.</p>
-    <button id="logout-btn">Выйти</button>
 </main>
 
 <div id="login-modal" class="modal hidden">

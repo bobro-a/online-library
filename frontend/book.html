@@ -7,13 +7,20 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header>
-    <div id="user-info" class="user-info hidden">
-        👤 <span id="user-message"></span>
+<header class="main-header">
+    <div class="header-left">
+        <div id="user-info" class="user-info hidden">
+            <span id="user-message"></span>
+        </div>
     </div>
-    <h1 id="book-title">Загрузка...</h1>
-    <div class="back-button">
-        <a href="catalog.html">Назад в каталог</a>
+
+    <div class="header-center">
+        <h1 id="book-title">Загрузка...</h1>
+    </div>
+
+    <div class="header-right">
+        <a href="index.html" class="back-button">Главная</a>
+        <a href="catalog.html" class="back-button">В каталог</a>
     </div>
 </header>
 <main>
@@ -31,9 +38,9 @@
                 <span id="book-rating"></span>
             </p>
             <span id="book-rating-stars" class="rating-stars" data-id=""></span>
-            <a id="read-link" target="_blank">📖 Читать</a> |
-            <a id="download-link" download>⬇️ Скачать</a>
-            <button id="favorite-btn">⭐ Добавить в избранное</button>
+            <a id="read-link" class="book-action" target="_blank">Читать</a> |
+            <a id="download-link" class="book-action" download>Скачать</a>
+            <button id="favorite-btn" class="favorite-btn">⭐ Добавить в избранное</button>
         </div>
     </div>
 

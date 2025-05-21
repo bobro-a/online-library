@@ -1,40 +1,158 @@
 /* Шрифт */
 @font-face {
-    font-family: 'Littera Plain';
-    src: url('fonts/LitteraPlain.woff2') format('woff2');
+    font-family: 'Littera Plain Book';
+    src: url('fonts/LitteraPlainBook.eot');
+    src: local('Littera Plain Book'), local('LitteraPlainBook'),
+    url('fonts/LitteraPlainBook.eot?#iefix') format('embedded-opentype'),
+    url('fonts/LitteraPlainBook.woff2') format('woff2'),
+    url('fonts/LitteraPlainBook.woff') format('woff'),
+    url('fonts/LitteraPlainBook.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Littera Plain';
+    src: url('fonts/LitteraPlainBold.eot');
+    src: local('Littera Plain Bold'), local('LitteraPlainBold'),
+    url('fonts/LitteraPlainBold.eot?#iefix') format('embedded-opentype'),
+    url('fonts/LitteraPlainBold.woff2') format('woff2'),
+    url('fonts/LitteraPlainBold.woff') format('woff'),
+    url('fonts/LitteraPlainBold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Littera Plain';
+    src: url('fonts/LitteraPlainMedium.eot');
+    src: local('Littera Plain Medium'), local('LitteraPlainMedium'),
+    url('fonts/LitteraPlainMedium.eot?#iefix') format('embedded-opentype'),
+    url('fonts/LitteraPlainMedium.woff2') format('woff2'),
+    url('fonts/LitteraPlainMedium.woff') format('woff'),
+    url('fonts/LitteraPlainMedium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
 }
 
 body {
-    font-family: 'Littera Plain', sans-serif;
-    background-color: whitesmoke;
-    color: #333;
-    margin: 0;
-    padding: 0;
+    font-family: 'Littera Plain', serif;
+    background-color: #C89077;
+    color: #cfe7dc;
 }
 
 /* Общие блоки */
-header, footer {
-    background-color: darkgray;
-    color: white;
-    padding: 1em;
+header{
+    background-color: #523628;
+    color: #EEDCD3;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+header nav {
+    display: flex;
+    justify-content: right;
+    gap: 1.5em;
+    margin-top: 0.5em;
+}
+
+header nav a {
+    color: #F2C6A0;
+    font-weight: bold;
+    font-size: 18px;
+    text-decoration: none;
+    position: relative;
+}
+
+header nav a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #C89077;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    transform-origin: center;
+}
+
+header nav a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.main-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: end;
+    padding: 3em 2em;
+    background-color: #523628;
+    color: #EEDCD3;
+    gap: 1em;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
 }
 
+.header-center h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-end; /* вертикальное выравнивание вниз */
+    height: 100%;
+    gap: 1em;
+    margin-top: 0.8em;
+}
+
+.header-right nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+    height: 100%;
+}
+
+@media (max-width: 600px) {
+    .main-header {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .header-right {
+        align-items: center;
+    }
+}
+
+footer {
+    position: static;
+    text-align: center;
+    font-size: 0.9em;
+    opacity: 0.85;
+    border-top: 2px solid #7a4d3d;
+}
+
 main {
-    padding: 2em;
-}
-
-nav a, .back-button a {
-    color: white;
-    text-decoration: none;
-    margin: 0 1em;
-}
-
-nav a:hover, .back-button a:hover {
-    text-decoration: underline;
-    color: lightyellow;
+    padding: 3em;
 }
 
 /* Строка поиска */
@@ -48,42 +166,54 @@ nav a:hover, .back-button a:hover {
 }
 
 #search-input {
-    width: 100%;
+    flex: 1;
     max-width: 400px;
     padding: 10px 14px;
     font-size: 16px;
-    border: 1px solid #ccc;
+    border: 1px solid #c4a093;
     border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    transition: border-color 0.3s, box-shadow 0.3s;
+    background-color: #fff8f6;
+    color: #523628;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 #search-input:focus {
     outline: none;
-    border-color: #888;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+    border-color: #a46e5e;
+    box-shadow: 0 0 6px rgba(164, 110, 94, 0.3);
 }
 
 #search-field {
-    padding: 8px;
+    padding: 10px;
     font-size: 16px;
     border-radius: 6px;
-    border: 1px solid #ccc;
+    border: 1px solid #c4a093;
+    background-color: #fff8f6;
+    color: #523628;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#search-field:focus {
+    outline: none;
+    border-color: #a46e5e;
+    box-shadow: 0 0 6px rgba(164, 110, 94, 0.3);
 }
 
 /* Каталог */
 #book-list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1em;
+    row-gap: 3.5em;
+    column-gap: 1em;
     align-items: stretch;
 }
 
 .book-card {
-    background: white;
-    padding: 1em;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    background-color: #EEDCD3;
+    color: black;
+    padding: 1.2em;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -92,19 +222,33 @@ nav a:hover, .back-button a:hover {
 }
 
 .book-card a {
+    position: relative;
     text-decoration: none;
-    color: darkblue;
+    color: #37241B;
     font-weight: bold;
 }
 
-.book-card a:hover {
-    text-decoration: underline;
+.book-card a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 1.5px;
+    background-color: #37241B;
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease;
+}
+
+.book-card a:hover::after {
+    transform: scaleX(1);
 }
 
 /* Обложки */
 .book-cover {
     width: 100%;
-    height: 220px;
+    height: 280px;
     object-fit: cover;
     border-radius: 8px;
     margin-bottom: 1em;
@@ -126,6 +270,7 @@ nav a:hover, .back-button a:hover {
 }
 
 .book-info {
+    color: #37241B;
     flex: 1;
     min-width: 280px;
 }
@@ -146,6 +291,14 @@ nav a:hover, .back-button a:hover {
     margin-top: 0.5em;
 }
 
+.rating-stars.center {
+    justify-content: center;
+}
+
+.rating-stars:not(.center) {
+    justify-content: flex-start;
+}
+
 .rating-stars .star {
     color: #ccc;
     cursor: pointer;
@@ -153,7 +306,7 @@ nav a:hover, .back-button a:hover {
 }
 
 .rating-stars:hover .star {
-    color: gold;
+    color: #ffc300;
 }
 
 .rating-stars .star:hover ~ .star {
@@ -171,107 +324,428 @@ nav a:hover, .back-button a:hover {
     text-align: left;
 }
 
+#comment-section h2 {
+    margin-bottom: 0.5em;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #37241B;
+}
+
 .comment {
-    background-color: #f4f4f4;
-    border-radius: 4px;
-    padding: 6px;
-    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background-color: #fdf5f1;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #f1ddd6;
+}
+
+.comment::before {
+    content: "💬";
+    font-size: 20px;
+    margin-top: 2px;
+}
+
+.comment span {
+    display: block;
+    color: #523628;
+    margin-bottom: 4px;
+}
+
+.comment small {
+    color: #a67c6b;
+    font-size: 12px;
 }
 
 .comment-text, #new-comment {
     width: 100%;
-    height: 60px;
-    padding: 8px;
+    height: 80px;
+    padding: 10px;
     font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+    border-radius: 8px;
+    border: 1px solid #e3c5b8;
+    background-color: #fff8f5;
     resize: vertical;
     box-sizing: border-box;
-    margin-top: 0.5em;
+    margin-top: 0.8em;
+    color: #523628;
 }
 
 .comment-submit, #submit-comment {
-    margin-top: 6px;
-    padding: 6px 12px;
+    margin-top: 10px;
+    padding: 10px 16px;
     font-size: 14px;
-    background-color: darkgray;
-    color: white;
+    font-weight: bold;
+    background-color: #C89077;
+    color: #523628;
     border: none;
-    border-radius: 4px;
+    border-radius: 999px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .comment-submit:hover, #submit-comment:hover {
-    background-color: gray;
+    background-color: #a46e5e;
+    transform: scale(1.05);
 }
 
 /* Назад */
 .back-button {
-    margin-bottom: 1.5em;
-    text-align: center;
+    color: #F2C6A0;
+    font-weight: bold;
+    font-size: 18px;
+    text-decoration: none;
+    position: relative;
 }
 
+.back-button::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #C89077;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    transform-origin: center;
+}
 
-/*регистраиця*/
+.back-button:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+.back-button:hover {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/*регистраиця и вход*/
+.nav-buttons {
+    display: flex;
+    align-items: center;
+    gap: 2em; /* Увеличенный отступ между блоками */
+    flex-wrap: wrap;
+}
+
+.auth-buttons {
+    display: flex;
+    gap: 1em;
+}
+
+.nav-link-wrapper a {
+    color: #F2C6A0;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+    position: relative;
+}
+
+.nav-link-wrapper a::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #C89077;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    transform-origin: center;
+}
+
+.nav-link-wrapper a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+#open-login,
+#open-register {
+    background-color: transparent;
+    border: 2px solid #F2C6A0;
+    color: #F2C6A0;
+    padding: 8px 20px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+}
+
+#open-login:hover,
+#open-register:hover {
+    background-color: #F2C6A0;
+    color: #523628;
+}
+
+.tab-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1em;
+    gap: 1em;
+}
+
+.tab-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 999px;
+    background-color: #f3e0d9;
+    color: #523628;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.tab-buttons button.active {
+    background-color: #C89077;
+    color: white;
+}
+
+.tab-form {
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-form.hidden {
+    display: none;
+}
+
 .modal.hidden {
     display: none;
 }
 
 .modal {
     position: fixed;
-    z-index: 10;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* тёмное затемнение */
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
 }
 
 .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
+    background-color: #fff8f5;
+    color: #523628;
+    padding: 2em;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     position: relative;
+    animation: fadeIn 0.3s ease-out;
 }
 
 .close {
     position: absolute;
-    top: 5px; right: 10px;
-    font-size: 20px;
+    right: 1em;
+    top: 1em;
+    font-size: 24px;
+    color: #a67c6b;
     cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #523628;
+}
+/* Стили формы */
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.modal-content input {
+    padding: 10px;
+    border: 1px solid #d9bfb3;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #523628;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: #C89077;
+    box-shadow: 0 0 5px rgba(200, 144, 119, 0.5);
+}
+
+.modal-content button {
+    padding: 10px 14px;
+    font-size: 14px;
+    background-color: #C89077;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.modal-content button:hover {
+    background-color: #a46e5e;
+}
+
+/* Анимация */
+@keyframes fadeIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 .hidden {
-    display: none !important;
+    display: none;
+}
+
+.tab-buttons button.active {
+    background-color: #C89077;
+    color: white;
 }
 
 /*иконка пользователя */
 .user-info {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    font-size: 16px;
-    background: #f0f0f0;
-    padding: 6px 10px;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    background-color: #fdf5f1;
+    backdrop-filter: blur(2px);
+    color: #523628;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid #e3c5b8;
+    margin-left: auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .user-info.hidden {
     display: none;
 }
 
-.user-info a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
+.user-info::before {
+    content: "👤";
+    font-size: 22px;
 }
+
+.user-info a {
+    background-color: transparent;
+    border: 1px solid #523628;
+    color: #523628;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.user-info a:hover {
+    background-color: #523628;
+    color: #fff8f0;
+}
+
 .disabled {
     opacity: 0.5;
     pointer-events: none;
     text-decoration: none;
     color: gray;
 }
+
+/*Кнопки*/
+.book-action {
+    display: inline-block;
+    background-color: transparent;
+    color: #523628;
+    border: 2px solid #523628;
+    padding: 6px 14px;
+    margin: 6px 6px 6px 0;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.book-action:hover {
+    background-color: #523628;
+    color: #fff8f1;
+}
+
+.favorite-btn {
+    display: inline-block;
+    background-color: #C89077;
+    color: #37241B;
+    padding: 6px 14px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 999px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.favorite-btn:hover {
+    background-color: #a46e5e;
+    transform: scale(1.05);
+}
+
+.favorite-btn.disabled {
+    background-color: #ccc;
+    color: #777;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/*Кнопка выйти*/
+.logout-btn {
+    margin-top: 1em;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: transparent;
+    border: 2px solid #F2C6A0;
+    color: #523628;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.logout-btn:hover {
+    background-color: #F2C6A0;
+    color: #523628;
+}
+
+/*Страница пользователя*/
+.user-page {
+    color: #37241B;
+    padding: 3em 2em;
+    background-color: #EEDCD3;
+    border-radius: 12px;
+    max-width: 1000px;
+    margin: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.user-page h2 {
+    font-size: 1.5em;
+    color: #523628;
+    margin-bottom: 1em;
+}
+
+.user-page h3 {
+    font-size: 1.2em;
+    margin-top: 2em;
+    margin-bottom: 1em;
+    color: #523628;
+}
+

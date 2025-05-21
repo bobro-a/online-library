@@ -6,17 +6,26 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-    <h1>Профиль пользователя</h1>
-    <nav>
-        <a href="catalog.html">Вернуться к каталогу</a>
-    </nav>
+<header class="main-header">
+
+    <div class="header-center">
+        <h1>Профиль пользователя</h1>
+    </div>
+
+    <div class="header-right">
+        <nav>
+            <a href="index.html"> Главная</a>
+            <a href="catalog.html">Вернуться к каталогу</a>
+        </nav>
+    </div>
 </header>
-<main>
+
+<main class="user-page">
     <h2 id="user-greeting">Загрузка...</h2>
+    <button id="logout-btn" class="logout-btn">Выйти</button>
     <section>
         <h3>⭐ Избранные книги:</h3>
-        <div id="favorites-list">Загрузка...</div>
+        <div id="book-list">Загрузка...</div>
     </section>
 </main>
 <script src="user.js"></script>

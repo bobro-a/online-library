@@ -61,32 +61,6 @@ window.addEventListener('DOMContentLoaded', () => {
         welcome.textContent = `👋 Добро пожаловать, ${storedUser}!`;
     }
 
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            sessionStorage.removeItem('user');
-
-            // Обновить иконку
-            const userInfo = document.getElementById('user-info');
-            const userMessage = document.getElementById('user-message');
-            if (userInfo && userMessage) {
-                userMessage.textContent = 'Гость';
-                userInfo.classList.remove('hidden');
-            }
-
-            // Обновить приветствие
-            const welcome = document.getElementById('welcome-message');
-            if (welcome) {
-                welcome.textContent = 'Вы не вошли в систему.';
-            }
-
-            // Показать кнопки входа/регистрации
-            const openLogin = document.getElementById('open-login');
-            const openRegister = document.getElementById('open-register');
-            if (openLogin) openLogin.classList.remove('hidden');
-            if (openRegister) openRegister.classList.remove('hidden');
-        });
-    }
 });
 
 async function fetchUserFavorites(username) {
@@ -134,52 +108,21 @@ async function renderBooks(bookArray) {
             <p><strong>Год:</strong> ${book.year || '-'}</p>
             <p><strong>Рейтинг:</strong> <span class="rating-value">${ratingValue}</span></p>
             ${currentUser === "Гость"
-            ? `<div class="rating-stars" style="opacity: 0.5; pointer-events: none;" title="Оценка доступна после входа">★ ★ ★ ★ ★</div>`
-            : `<div class="rating-stars" data-id="${book.id}">
+            ? `<div class="rating-stars center" style="opacity: 0.5; pointer-events: none;" title="Оценка доступна после входа">★ ★ ★ ★ ★</div>`
+            : `<div class="rating-stars center" data-id="${book.id}">
       ${[1, 2, 3, 4, 5].map(i => `<span class="star" data-value="${i}">★</span>`).join('')}
     </div>`}
 
           </div>
           <div class="card-footer">
             ${currentUser === "Гость"
-            ? `<a href="${book.pdf}" target="_blank">📖 Читать</a> &nbsp;|&nbsp; <span class="disabled">⬇️ Скачать</span>`
-            : `<a href="${book.pdf}" target="_blank">📖 Читать</a> &nbsp;|&nbsp; <a href="${book.pdf}" download>⬇️ Скачать</a>`}
+            ? `<a href="${book.pdf}" target="_blank">Читать</a> &nbsp;|&nbsp; <span class="disabled">Скачать</span>`
+            : `<a href="${book.pdf}" target="_blank">Читать</a> &nbsp;|&nbsp; <a href="${book.pdf}" download>Скачать</a>`}
             ${currentUser === "Гость"
             ? `<button class="favorite-btn disabled" disabled title="Войдите, чтобы добавить в избранное">⭐ В избранное</button>`
-            : `<button class="favorite-btn" data-id="${book.id}">⭐ В избранное</button>`}
-            ${currentUser === "Гость"
-            ? `<p><em>Комментарии доступны только авторизованным пользователям.</em></p>`
-            : `
-    <div class="comment-section">
-      <textarea placeholder="Оставьте комментарий..." class="comment-text" data-id="${book.id}"></textarea>
-      <button class="comment-submit" data-id="${book.id}">💬 Отправить</button>
-    </div>
-  `}
-
+            : `<button class="favorite-btn" data-id="${book.id}">⭐ В избранное</button>`            }
           </div>
         `;
-
-        // Загрузка комментариев
-        fetch(`http://localhost:8080/comments?book_id=${book.id}`)
-            .then(res => res.json())
-            .then(comments => {
-                const commentsContainer = document.createElement('div');
-                commentsContainer.className = 'comment-list';
-
-                if (comments.length > 0) {
-                    commentsContainer.innerHTML = '<p><strong>Комментарии:</strong></p>' +
-                        comments.map(c =>
-                            `<div class="comment"><span>${c.content}</span> <small>(${new Date(c.created_at).toLocaleString()})</small></div>`
-                        ).join('');
-                } else {
-                    commentsContainer.innerHTML = '<p><em>Комментариев пока нет.</em></p>';
-                }
-
-                div.appendChild(commentsContainer);
-            })
-            .catch(err => {
-                console.error("Ошибка загрузки комментариев:", err);
-            });
 
         // Обработка кнопки "В избранное"
         const favBtn = div.querySelector('.favorite-btn');

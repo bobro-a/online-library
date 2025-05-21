@@ -26,7 +26,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     if (searchInput && searchField) {
         searchInput.addEventListener('input', () => {
-            const query = searchInput.value.trim().toLowerCase();
+            const rawQuery = searchInput.value.trim();
+            const query = rawQuery.replace(',', '.').toLowerCase();
             const field = searchField.value;
 
             const filtered = books.filter(book => {

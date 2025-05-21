@@ -9,6 +9,7 @@ fetch(`http://localhost:8080/books`)
 
         document.title = book.title;
         document.getElementById('book-title-info').textContent = book.title;
+        document.getElementById('book-title').textContent = book.title;
         document.getElementById('book-author').textContent = book.author;
         document.getElementById('book-tags').textContent = book.tags;
         document.getElementById('book-year').textContent = book.year;

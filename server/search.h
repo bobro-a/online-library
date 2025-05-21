@@ -12,17 +12,22 @@ using namespace std;
 
 extern pqxx::connection *conn;
 
-vector<Book> searchBooksBy(const string &parametr, const string& value) {
+vector<Book> searchBooksBy(const string &parameter, const string& value) {
     vector<Book> result;
     try {
         pqxx::work txn(*conn);
         string query = "SELECT * FROM books";
-        if (!parametr.empty() && !value.empty()) {
+        if (!parameter.empty() && !value.empty()) {
             query += " WHERE ";
-            if (parametr=="rating" || parametr=="year") query += parametr + " = " + value;
-            else query += parametr + " ILIKE '%" + value + "%'";
+            if (parameter=="year") query += parameter + " = " + value;
+            if (parameter == "rating") {
+                double val = stod(value);
+                query += parameter + " BETWEEN " + to_string(val - 0.05) + " AND " + to_string(val + 0.05);
+            }
+
+            else query += parameter + " ILIKE '%" + value + "%'";
         }
-        auto r = txn.exec(query);
+        auto r = txn.exec_params(query);
         for (auto row : r) {
             Book book;
             book.id = row["id"].as<int>();

@@ -1,6 +1,19 @@
 let books = [];  // Сохраняем список книг для фильтрации
 
 window.addEventListener('DOMContentLoaded', () => {
+    const user = localStorage.getItem('user');
+    const userInfo = document.getElementById('user-info');
+    const userMessage = document.getElementById('user-message');
+
+    if (userInfo && userMessage) {
+        if (user) {
+            userMessage.innerHTML = `<a href="user.html">${user}</a>`;
+        } else {
+            userMessage.textContent = 'Гость';
+        }
+        userInfo.classList.remove('hidden');
+    }
+
     const BookList = document.getElementById('book-list');
     if (!BookList) return;  // Защита: если элемент отсутствует — выходим
 

@@ -11,6 +11,9 @@
     <h1 id="book-title">Загрузка...</h1>
 </header>
 <main>
+    <div class="back-button">
+        <a href="books.html">⬅️ Назад в каталог</a>
+    </div>
     <div class="book-layout">
         <div class="book-cover-block">
             <img id="book-cover" class="book-cover-large" alt="Обложка">
@@ -20,7 +23,11 @@
             <p><strong>Автор:</strong> <span id="book-author"></span></p>
             <p><strong>Жанр:</strong> <span id="book-tags"></span></p>
             <p><strong>Год:</strong> <span id="book-year"></span></p>
-            <p><strong>Рейтинг:</strong> <span id="book-rating"></span></p>
+            <p>
+                <strong>Рейтинг:</strong>
+                <span id="book-rating"></span>
+            </p>
+            <span id="book-rating-stars" class="rating-stars" data-id=""></span>
             <a id="read-link" target="_blank">📖 Читать</a> |
             <a id="download-link" download>⬇️ Скачать</a>
         </div>

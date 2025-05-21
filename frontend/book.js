@@ -13,6 +13,9 @@ fetch(`http://localhost:8080/books`)
         document.getElementById('book-tags').textContent = book.tags;
         document.getElementById('book-year').textContent = book.year;
         document.getElementById('book-rating').textContent = book.rating?.toFixed(1) || '—';
+        document.getElementById('book-rating-stars').dataset.id = book.id;
+        document.getElementById('book-rating-stars').innerHTML =
+            [1, 2, 3, 4, 5].map(i => `<span class="star" data-value="${i}">★</span>`).join('');
         document.getElementById('book-cover').src = book.cover;
         document.getElementById('read-link').href = book.pdf;
         document.getElementById('download-link').href = book.pdf;
@@ -48,3 +51,26 @@ fetch(`http://localhost:8080/comments?book_id=${bookId}`)
             }).then(() => location.reload());
         });
     });
+
+document.addEventListener('click', e => {
+    if (e.target.classList.contains('star')) {
+        const star = e.target;
+        const value = parseInt(star.dataset.value);
+        const bookId = star.closest('.rating-stars').dataset.id;
+
+        fetch("http://localhost:8080/rate", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ book_id: bookId, rating: value })
+        })
+            .then(res => res.json())
+            .then(() => {
+                alert(`Спасибо! Вы поставили ${value} ★`);
+                document.getElementById('book-rating').textContent = value.toFixed(1);
+            })
+            .catch(err => {
+                alert('❌ Не удалось отправить рейтинг');
+                console.error(err);
+            });
+    }
+});

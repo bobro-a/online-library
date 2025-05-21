@@ -178,7 +178,7 @@ string handleRequest(const string &req) {
                "Access-Control-Allow-Origin: *\r\n"
                "Content-Length: " + to_string(body.size()) + "\r\n\r\n" + body;
     }
-    if (req.find("POST /review") == 0) {
+    if (req.find("POST /comment") == 0) {
         size_t body_pos = req.find("\r\n\r\n");
         if (body_pos == string::npos) return "400 Bad Request";
 
@@ -194,7 +194,12 @@ string handleRequest(const string &req) {
             txn.exec_params("INSERT INTO reviews(book_id, username, text) VALUES($1, $2, $3)",
                             stoi(book_id_str), username, text);
             txn.commit();
-            return "HTTP/1.1 200 OK\r\n\r\nReview submitted";
+            string msg = "Review submitted";
+            return "HTTP/1.1 200 OK\r\n"
+                   "Access-Control-Allow-Origin: *\r\n"
+                   "Content-Type: text/plain\r\n"
+                   "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
+
         } catch (...) {
             return "HTTP/1.1 500 Internal Server Error\r\n"
                     "Access-Control-Allow-Origin: *\r\n"

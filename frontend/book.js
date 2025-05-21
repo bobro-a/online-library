@@ -90,6 +90,5 @@ document.addEventListener('click', e => {
                 alert('❌ Не удалось отправить рейтинг');
                 console.error(err);
             });
-
     }
 });

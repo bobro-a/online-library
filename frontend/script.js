@@ -118,6 +118,7 @@ function renderBooks(bookArray) {
             <a href="${book.pdf}" target="_blank">📖 Читать</a>
             &nbsp;|&nbsp;
             <a href="${book.pdf}" download>⬇️ Скачать</a>
+            <button class="favorite-btn" data-id="${book.id}">⭐ В избранное</button>
             <div class="comment-section">
               <textarea placeholder="Оставьте комментарий..." class="comment-text" data-id="${book.id}"></textarea>
               <button class="comment-submit" data-id="${book.id}">💬 Отправить</button>
@@ -148,7 +149,36 @@ function renderBooks(bookArray) {
             });
 
         BookList.appendChild(div);
+        const favBtn = div.querySelector('.favorite-btn');
+        if (favBtn) {
+            const bookId = parseInt(favBtn.dataset.id);
+            const updateBtnText = () => {
+                favBtn.textContent = getFavorites().includes(bookId)
+                    ? '⭐ Удалить из избранного'
+                    : '⭐ В избранное';
+            };
+            updateBtnText();
+            favBtn.addEventListener('click', () => {
+                toggleFavorite(bookId);
+                updateBtnText();
+            });
+        }
     });
+}
+function getFavorites() {
+    return JSON.parse(localStorage.getItem('favorites-list') || '[]');
+}
+function toggleFavorite(bookId) {
+    let favorites = getFavorites();
+    const index = favorites.indexOf(bookId);
+
+    if (index >= 0) {
+        favorites.splice(index, 1);
+    } else {
+        favorites.push(bookId);
+    }
+
+    localStorage.setItem('favorites-list', JSON.stringify(favorites));
 }
 
 // Обработка рейтинга и комментариев

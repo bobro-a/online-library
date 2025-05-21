@@ -33,6 +33,7 @@
             <span id="book-rating-stars" class="rating-stars" data-id=""></span>
             <a id="read-link" target="_blank">📖 Читать</a> |
             <a id="download-link" download>⬇️ Скачать</a>
+            <button id="favorite-btn">⭐ Добавить в избранное</button>
         </div>
     </div>
 
@@ -40,5 +41,15 @@
 </main>
 
 <script src="book.js"></script>
+<script type="module">
+    import { setupFavoriteButton } from './favorites.js';
+
+    const favBtn = document.getElementById('favorite-btn');
+    if (favBtn) {
+        const bookId = parseInt(new URLSearchParams(window.location.search).get('id'));
+        setupFavoriteButton(favBtn, bookId);
+    }
+</script>
+
 </body>
 </html>

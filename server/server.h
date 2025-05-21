@@ -194,10 +194,10 @@ string handleRequest(const string &req) {
             txn.exec_params("INSERT INTO reviews(book_id, username, text) VALUES($1, $2, $3)",
                             stoi(book_id_str), username, text);
             txn.commit();
-            string msg = "Review submitted";
+            string msg = "{\"status\":\"ok\",\"message\":\"Review submitted\"}";
             return "HTTP/1.1 200 OK\r\n"
                    "Access-Control-Allow-Origin: *\r\n"
-                   "Content-Type: text/plain\r\n"
+                   "Content-Type: application/json\r\n"
                    "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
 
         } catch (...) {
@@ -226,8 +226,8 @@ string handleRequest(const string &req) {
             auto r = txn.exec_params("SELECT total_rating, votes FROM books WHERE id = $1", book_id);
             if (r.empty())
                 return "HTTP/1.1 404 Not Found\r\n"
-            "Access-Control-Allow-Origin: *\r\n"
-            "Content-Type: text/plain\r\n\r\nBook not found";
+                        "Access-Control-Allow-Origin: *\r\n"
+                        "Content-Type: text/plain\r\n\r\nBook not found";
 
             double total = r[0][0].as<double>();
             int votes = r[0][1].as<int>();
@@ -241,11 +241,11 @@ string handleRequest(const string &req) {
                             total, votes, updated_rating, book_id);
 
             txn.commit();
-            string message="Rating updated";
+            string message = "Rating updated";
             return "HTTP/1.1 200 OK\r\n"
-                    "Access-Control-Allow-Origin: *\r\n"
-                    "Content-Type: text/plain\r\n"
-                    "Content-Length: "+ to_string(message.size()) + "\r\n\r\n" + message;
+                   "Access-Control-Allow-Origin: *\r\n"
+                   "Content-Type: text/plain\r\n"
+                   "Content-Length: " + to_string(message.size()) + "\r\n\r\n" + message;
         } catch (...) {
             return "HTTP/1.1 400 Bad Request\r\n"
                     "Access-Control-Allow-Origin: *\r\n"
@@ -316,11 +316,11 @@ string handleRequest(const string &req) {
                 txn.exec_params("DELETE FROM favorites WHERE user_id=$1 AND book_id=$2", user_id, book_id);
             }
             txn.commit();
-            string msg="Favorite updated";
+            string msg = "Favorite updated";
             return "HTTP/1.1 200 OK\r\n"
-                    "Access-Control-Allow-Origin: *\r\n"
-                    "Content-Type: text/plain\r\n"
-                    "Content-Length: "+to_string(msg.size()) + "\r\n\r\n" + msg;;
+                   "Access-Control-Allow-Origin: *\r\n"
+                   "Content-Type: text/plain\r\n"
+                   "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;;
         } catch (...) {
             return "HTTP/1.1 400 Bad Request\r\n"
                     "Access-Control-Allow-Origin: *\r\n"
@@ -371,12 +371,11 @@ string handleRequest(const string &req) {
                     "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\nContent-Length: "
                     + to_string(body.size()) + "\r\n\r\n" + body;
         } catch (...) {
-            string msg="Internal server error";
+            string msg = "Internal server error";
             return "HTTP/1.1 500 Internal Server Error\r\n"
-                    "Access-Control-Allow-Origin: *\r\n"
-                    "Content-Type: text/plain\r\n"
-                    "Content-Length: "+ to_string(msg.size()) + "\r\n\r\n" + msg;
-
+                   "Access-Control-Allow-Origin: *\r\n"
+                   "Content-Type: text/plain\r\n"
+                   "Content-Length: " + to_string(msg.size()) + "\r\n\r\n" + msg;
         }
     }
     if (req.find("GET /comments?book_id=") == 0) {

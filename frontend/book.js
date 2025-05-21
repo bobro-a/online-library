@@ -47,8 +47,18 @@ fetch(`http://localhost:8080/comments?book_id=${bookId}`)
             fetch("http://localhost:8080/comment", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({  book_id: bookId, username: "Гость", text: comment })
-            }).then(() => location.reload());
+                body: JSON.stringify({ book_id: bookId, username: "Гость", text })
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("Ошибка при отправке комментария");
+                    return res.text();
+                })
+                .then(() => location.reload())
+                .catch(err => {
+                    alert("❌ Комментарий не отправлен");
+                    console.error(err);
+                });
+
         });
     });
 

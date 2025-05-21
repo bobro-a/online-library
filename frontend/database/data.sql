@@ -21,11 +21,13 @@ create table books
 
 create table reviews
 (
-    id       serial primary key,
-    book_id  int references books (id),
-    username text,
-    text     text
+    id         serial primary key,
+    book_id    int references books (id),
+    username   text,
+    text       text,
+    created_at TIMESTAMP DEFAULT now()
 );
+
 
 create table favorites
 (
@@ -36,9 +38,9 @@ create table favorites
 
 insert into books(title, book_path, cover_path, author, tags, year)
 values ('Анна Каренина', '/database/books/Anna_Karenina.pdf', '/database/covers/Anna_Karenina.jpg',
-        'Лев Николаевич Толстой', 'классика',  1878),
+        'Лев Николаевич Толстой', 'классика', 1878),
        ('Мастер и Маргарита', '/database/books/Master_Margarita.pdf', '/database/covers/Master_Margarita.jpg',
-        'Михаил Афанасьевич Булгаков', 'классика',  1967),
+        'Михаил Афанасьевич Булгаков', 'классика', 1967),
        ('Портрет Дориана Грея', '/database/books/Portret_Doriana_Greya.pdf',
         '/database/covers/Portret_Doriana_Greya.jpg', 'Оскар Уайлд', 'зарубежная классика', 1890);
 

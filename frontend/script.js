@@ -1,13 +1,18 @@
 let books = [];  // Сохраняем список книг для фильтрации
 
 window.addEventListener('DOMContentLoaded', () => {
-    const user = localStorage.getItem('user');
+    const user = sessionStorage.getItem('user');
     const userInfo = document.getElementById('user-info');
     const userMessage = document.getElementById('user-message');
 
     if (userInfo && userMessage) {
         if (user) {
             userMessage.innerHTML = `<a href="user.html">${user}</a>`;
+
+            const openLogin = document.getElementById('open-login');
+            const openRegister = document.getElementById('open-register');
+            if (openLogin) openLogin.classList.add('hidden');
+            if (openRegister) openRegister.classList.add('hidden');
         } else {
             userMessage.textContent = 'Гость';
         }
@@ -52,18 +57,36 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // ✅ Показываем приветствие, если пользователь уже вошёл
-    const storedUser = localStorage.getItem('user');
+    const storedUser = sessionStorage.getItem('user');
     const welcome = document.getElementById('welcome-message');
     if (storedUser && welcome) {
         welcome.textContent = `👋 Добро пожаловать, ${storedUser}!`;
     }
 
-    // ✅ Обработка выхода
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('user');
-            location.reload();
+            sessionStorage.removeItem('user');
+
+            // Обновить иконку
+            const userInfo = document.getElementById('user-info');
+            const userMessage = document.getElementById('user-message');
+            if (userInfo && userMessage) {
+                userMessage.textContent = 'Гость';
+                userInfo.classList.remove('hidden');
+            }
+
+            // Обновить приветствие
+            const welcome = document.getElementById('welcome-message');
+            if (welcome) {
+                welcome.textContent = 'Вы не вошли в систему.';
+            }
+
+            // Показать кнопки входа/регистрации
+            const openLogin = document.getElementById('open-login');
+            const openRegister = document.getElementById('open-register');
+            if (openLogin) openLogin.classList.remove('hidden');
+            if (openRegister) openRegister.classList.remove('hidden');
         });
     }
 });
@@ -263,9 +286,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 return res.text();
             })
             .then(() => {
-                localStorage.setItem('user', username);  // сохраняем логин
+                sessionStorage.setItem('user', username);
                 loginModal.classList.add('hidden');
 
+                // ✅ Обновляем блок с иконкой
+                const userMessage = document.getElementById('user-message');
+                const userInfo = document.getElementById('user-info');
+                if (userMessage && userInfo) {
+                    userMessage.innerHTML = `<a href="user.html">${username}</a>`;
+                    userInfo.classList.remove('hidden');
+                }
+
+                // ✅ (опционально) приветствие на главной
                 const welcome = document.getElementById('welcome-message');
                 if (welcome) {
                     welcome.textContent = `👋 Добро пожаловать, ${username}!`;

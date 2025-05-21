@@ -243,6 +243,10 @@ nav a:hover, .back-button a:hover {
     cursor: pointer;
 }
 
+.hidden {
+    display: none !important;
+}
+
 /*иконка пользователя */
 .user-info {
     position: fixed;

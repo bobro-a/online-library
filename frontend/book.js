@@ -1,5 +1,6 @@
 const params = new URLSearchParams(window.location.search);
 const bookId = params.get('id');
+const currentUser = sessionStorage.getItem("user") || "Гость";
 
 fetch(`http://localhost:8080/books`)
     .then(res => res.json())
@@ -17,9 +18,43 @@ fetch(`http://localhost:8080/books`)
         document.getElementById('book-rating-stars').dataset.id = book.id;
         document.getElementById('book-rating-stars').innerHTML =
             [1, 2, 3, 4, 5].map(i => `<span class="star" data-value="${i}">★</span>`).join('');
+        if (currentUser === "Гость") {
+            document.getElementById("book-rating-stars").style.display = "none";
+        }
         document.getElementById('book-cover').src = book.cover;
         document.getElementById('read-link').href = book.pdf;
         document.getElementById('download-link').href = book.pdf;
+        const favButton = document.getElementById('favorite-btn');
+
+        if (currentUser === "Гость") {
+            favButton.style.display = "none";
+        } else {
+            favButton.addEventListener("click", () => {
+                fetch("http://localhost:8080/favorite", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: currentUser, book_id: bookId, action: "add" })
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error("Ошибка сервера");
+                        alert("Книга добавлена в избранное!");
+                    })
+                    .catch(err => {
+                        alert("❌ Не удалось добавить в избранное.");
+                        console.error(err);
+                    });
+            });
+        }
+
+        if (currentUser === "Гость") {
+            const downloadLink = document.getElementById('download-link');
+            downloadLink.classList.add('disabled');
+            downloadLink.removeAttribute('href');
+            downloadLink.removeAttribute('download');
+            downloadLink.style.pointerEvents = 'none';
+            downloadLink.style.opacity = '0.5';
+            downloadLink.title = 'Войдите, чтобы скачать книгу';
+        }
     });
 
 fetch(`http://localhost:8080/comments?book_id=${bookId}`)
@@ -36,10 +71,35 @@ fetch(`http://localhost:8080/comments?book_id=${bookId}`)
             ).join('');
         }
 
-        container.innerHTML += `
-      <textarea id="new-comment" placeholder="Оставьте комментарий..."></textarea>
+        if (currentUser === "Гость") {
+            container.innerHTML += `<p><em>Оставлять комментарии могут только авторизованные пользователи.</em></p>`;
+        } else {
+            container.innerHTML += `
+      <textarea id="new-comment" placeholder="Оставьте комментарий."></textarea>
       <button id="submit-comment">💬 Отправить</button>
     `;
+
+            document.getElementById('submit-comment').addEventListener('click', () => {
+                const text = document.getElementById('new-comment').value.trim();
+                if (text === '') return alert("Комментарий не может быть пустым");
+
+                fetch("http://localhost:8080/comment", {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ book_id: bookId, username: currentUser, text })
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error("Ошибка при отправке комментария");
+                        return res.text();
+                    })
+                    .then(() => location.reload())
+                    .catch(err => {
+                        alert("❌ Комментарий не отправлен");
+                        console.error(err);
+                    });
+            });
+        }
+
 
         document.getElementById('submit-comment').addEventListener('click', () => {
             const text = document.getElementById('new-comment').value.trim();
@@ -65,6 +125,11 @@ fetch(`http://localhost:8080/comments?book_id=${bookId}`)
 
 document.addEventListener('click', e => {
     if (e.target.classList.contains('star')) {
+        if (currentUser === "Гость") {
+            alert("Оценивать книги могут только авторизованные пользователи.");
+            return;
+        }
+
         const star = e.target;
         const value = parseInt(star.dataset.value);
         const bookId = star.closest('.rating-stars').dataset.id;
@@ -74,17 +139,10 @@ document.addEventListener('click', e => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ book_id: bookId, rating: value })
         })
-            .then(res => {
-                if (!res.ok) throw new Error('Ошибка сервера');
-                return fetch("http://localhost:8080/books");
-            })
             .then(res => res.json())
-            .then(data => {
-                const updatedBook = data.find(b => b.id == bookId);
-                if (updatedBook) {
-                    document.getElementById('book-rating').textContent = updatedBook.rating.toFixed(1);
-                }
+            .then(() => {
                 alert(`Спасибо! Вы поставили ${value} ★`);
+                document.getElementById('book-rating').textContent = value.toFixed(1);
             })
             .catch(err => {
                 alert('❌ Не удалось отправить рейтинг');

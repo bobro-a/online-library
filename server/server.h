@@ -178,30 +178,6 @@ string handleRequest(const string &req) {
                "Access-Control-Allow-Origin: *\r\n"
                "Content-Length: " + to_string(body.size()) + "\r\n\r\n" + body;
     }
-    if (req.find("GET /download/") == 0) {
-        size_t start = req.find("/download/") + 10;
-        size_t end = req.find(' ', start);
-        string id_str = req.substr(start, end - start);
-
-        try {
-            int id = stoi(id_str);
-            auto book = findBookById(id);
-            if (book) {
-                ifstream file("." + book->pdf_url, ios::binary);
-                if (file) {
-                    string content((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
-                    return "HTTP/1.1 200 OK\r\n"
-                           "Content-Type: application/pdf\r\n"
-                           "Content-Disposition: attachment; filename=\"" + book->title + ".pdf\"\r\n"
-                           "Access-Control-Allow-Origin: *\r\n"
-                           "Content-Length: " + to_string(content.size()) + "\r\n\r\n" + content;
-                }
-            }
-            return "HTTP/1.1 404 Not Found\r\n\r\nFile not found";
-        } catch (...) {
-            return "HTTP/1.1 400 Bad Request\r\n\r\nInvalid ID";
-        }
-    }
     if (req.find("POST /review") == 0) {
         size_t body_pos = req.find("\r\n\r\n");
         if (body_pos == string::npos) return "400 Bad Request";
@@ -241,17 +217,24 @@ string handleRequest(const string &req) {
             pqxx::work txn(*conn);
 
             // Получаем текущий рейтинг
-            auto r = txn.exec_params("SELECT rating FROM books WHERE id = $1", book_id);
+            // Получаем текущие total_rating и votes
+            auto r = txn.exec_params("SELECT total_rating, votes FROM books WHERE id = $1", book_id);
             if (r.empty())
                 return "HTTP/1.1 404 Not Found\r\n"
-                        "Access-Control-Allow-Origin: *\r\n"
-                        "Content-Type: text/plain\r\n\r\nBook not found";
+            "Access-Control-Allow-Origin: *\r\n"
+            "Content-Type: text/plain\r\n\r\nBook not found";
 
-            double current_rating = r[0][0].as<double>();
-            double updated_rating = (current_rating + new_rating) / 2.0;
+            double total = r[0][0].as<double>();
+            int votes = r[0][1].as<int>();
 
-            // Обновляем рейтинг
-            txn.exec_params("UPDATE books SET rating = $1 WHERE id = $2", updated_rating, book_id);
+            total += new_rating;
+            votes += 1;
+            double updated_rating = total / votes;
+
+            // Обновляем книгу
+            txn.exec_params("UPDATE books SET total_rating = $1, votes = $2, rating = $3 WHERE id = $4",
+                            total, votes, updated_rating, book_id);
+
             txn.commit();
             string message="Rating updated";
             return "HTTP/1.1 200 OK\r\n"

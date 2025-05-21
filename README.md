@@ -20,6 +20,9 @@ sudo -u postgres psql -d "online-library"
 \dt        #-- покажет список таблиц
 SELECT * FROM books;
 ```
+```psql
+drop database if exists "online-library";
+```
 
 Запускаем скрипт server.sh и в отдельном терминале 
 запускаем client.sh

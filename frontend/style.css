@@ -269,3 +269,9 @@ nav a:hover, .back-button a:hover {
     color: #333;
     font-weight: bold;
 }
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    text-decoration: none;
+    color: gray;
+}

@@ -1,4 +1,6 @@
-const username = localStorage.getItem("user") || "Гость";
+
+
+const username = sessionStorage.getItem("user") || "Гость";
 
 const greeting = document.getElementById("user-greeting");
 greeting.textContent = `Привет, ${username}!`;

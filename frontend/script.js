@@ -146,7 +146,7 @@ document.addEventListener('click', e => {
         fetch("http://localhost:8080/comment", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: bookId, comment })
+            body: JSON.stringify({ book_id: bookId, username: "Гость", text: comment })
         })
             .then(res => res.json())
             .then(() => {

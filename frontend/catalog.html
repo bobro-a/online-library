@@ -15,7 +15,16 @@
 </header>
 
 <main>
-    <input type="text" id="search-input" placeholder="Поиск по названию или автору..." />
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Поиск...">
+        <select id="search-field">
+            <option value="title">По названию</option>
+            <option value="author">По автору</option>
+            <option value="year">По году</option>
+            <option value="tags">По жанру</option>
+            <option value="rating">По рейтингу</option>
+        </select>
+    </div>
     <div id="book-list">Загрузка книг...</div>
 </main>
 

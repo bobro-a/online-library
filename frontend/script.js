@@ -21,14 +21,25 @@ window.addEventListener('DOMContentLoaded', () => {
             console.error('Ошибка загрузки книг:', err);
         });
 
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
+    const searchField = document.getElementById('search-field');
+
+    if (searchInput && searchField) {
         searchInput.addEventListener('input', () => {
             const query = searchInput.value.trim().toLowerCase();
-            const filtered = books.filter(book =>
-                book.title.toLowerCase().includes(query) ||
-                book.author.toLowerCase().includes(query)
-            );
+            const field = searchField.value;
+
+            const filtered = books.filter(book => {
+                const value = (book[field] ?? '').toString().toLowerCase();
+
+                // Для числовых полей — точное сравнение
+                if (['year', 'rating'].includes(field)) {
+                    return value.startsWith(query);
+                }
+
+                // Для текстовых — по включению
+                return value.includes(query);
+            });
+
             renderBooks(filtered);
         });
     }

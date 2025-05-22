@@ -41,8 +41,8 @@ fetch(`http://localhost:8080/books`)
                         const action = isFavorite ? 'remove' : 'add';
                         fetch("http://localhost:8080/favorite", {
                             method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ currentUser, book_id: book.id, action })
+                            headers: {"Content-Type": "application/json"},
+                            body: JSON.stringify({currentUser, book_id: book.id, action})
                         })
                             .then(() => {
                                 isFavorite = !isFavorite;
@@ -95,8 +95,8 @@ fetch(`http://localhost:8080/comments?book_id=${bookId}`)
 
                 fetch("http://localhost:8080/comment", {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ book_id: bookId, username: currentUser, text })
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({book_id: bookId, username: currentUser, text})
                 })
                     .then(res => {
                         if (!res.ok) throw new Error("Ошибка при отправке комментария");
@@ -109,28 +109,6 @@ fetch(`http://localhost:8080/comments?book_id=${bookId}`)
                     });
             });
         }
-
-
-        document.getElementById('submit-comment').addEventListener('click', () => {
-            const text = document.getElementById('new-comment').value.trim();
-            if (text === '') return alert("Комментарий не может быть пустым");
-
-            fetch("http://localhost:8080/comment", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ book_id: bookId, username: "Гость", text })
-            })
-                .then(res => {
-                    if (!res.ok) throw new Error("Ошибка при отправке комментария");
-                    return res.text();
-                })
-                .then(() => location.reload())
-                .catch(err => {
-                    alert("❌ Комментарий не отправлен");
-                    console.error(err);
-                });
-
-        });
     });
 
 document.addEventListener('click', e => {
@@ -146,8 +124,8 @@ document.addEventListener('click', e => {
 
         fetch("http://localhost:8080/rate", {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ book_id: bookId, rating: value })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({book_id: bookId, rating: value})
         })
             .then(res => res.text())
             .then(() => {

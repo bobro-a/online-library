@@ -20,7 +20,10 @@ fetch(`http://localhost:8080/books`)
             [1, 2, 3, 4, 5].map(i => `<span class="star" data-value="${i}">★</span>`).join('');
         if (currentUser === "Гость") {
             document.getElementById("book-rating-stars").style.display = "none";
+            const favContainer = document.getElementById("favorite-container");
+            if (favContainer) favContainer.style.display = "none";
         }
+
         document.getElementById('book-cover').src = book.cover;
         document.getElementById('read-link').href = book.pdf;
         document.getElementById('download-link').href = book.pdf;
@@ -146,11 +149,20 @@ document.addEventListener('click', e => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ book_id: bookId, rating: value })
         })
-            .then(res => res.json())
+            .then(res => res.text())
             .then(() => {
                 alert(`Спасибо! Вы поставили ${value} ★`);
-                document.getElementById('book-rating').textContent = value.toFixed(1);
+                // Повторно загружаем книгу, чтобы получить обновлённый рейтинг
+                return fetch(`http://localhost:8080/books`);
             })
+            .then(res => res.json())
+            .then(books => {
+                const updatedBook = books.find(b => b.id == bookId);
+                if (updatedBook) {
+                    document.getElementById('book-rating').textContent = updatedBook.rating?.toFixed(1) || '—';
+                }
+            })
+
             .catch(err => {
                 alert('❌ Не удалось отправить рейтинг');
                 console.error(err);

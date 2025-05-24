@@ -9,5 +9,8 @@ pkg_check_modules(PQXX REQUIRED libpqxx)
 include_directories(${PQXX_INCLUDE_DIRS})
 link_directories(${PQXX_LIBRARY_DIRS})
 
-add_executable(server main.cpp)
+add_executable(server main.cpp
+        favorite.h
+        message.h
+        user.h)
 target_link_libraries(server PRIVATE ${PQXX_LIBRARIES})

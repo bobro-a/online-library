@@ -1,5 +1,12 @@
 #include "server.h"
-
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <pqxx/pqxx>
 using namespace std;
 
 pqxx::connection *conn;
